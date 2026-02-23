@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha RPG</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+
+<div class="sheet">
+<div style="margin-bottom: 10px; text-align: center;">
+  <a class="btn btn-outline-primary" href="index.html">Ficha</a>
+  <a class="btn btn-outline-primary" href="pericias.html">Pericias</a>
+  <a class="btn btn-outline-primary" href="habilidades.html">Habilidades</a>
+  <a class="btn btn-outline-primary" href="inventario.html">Inventário</a>
+  <a class="btn btn-outline-primary" href="detalhes.html">Detalhes</a>
+</div>
+
+<div class="top">
+  <div class="image-wrapper">
+    <img src="img/Aguiar.jpg" data-save="pfp" class="photo" id="charImage">
+    <input type="file" id="imageInput" accept="image/*" hidden>
+  </div>
+
+  <div class="info">
+    <div class="name-row">
+      <input class="editable name" disabled placeholder="Nome do personagem" data-save="nome">
+
+      <button class="edit-icon" onclick="toggleEdit()" id="editBtn">
+        <i class="bi bi-pencil-square"></i>
+      </button>
+    </div>
+
+    <div class="level">
+      <span title="Nex">Nex</span><input class="editable" disabled placeholder="40" data-save="Nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
+      Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Combatente" data-save="classe">
+        
+    </div>
+    <div class="level">
+      Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Aniquilador" data-save="Trilha">
+      Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" placeholder="Acadêmico" data-save="origem">
+    </div>
+  </div>
+</div>
+
+
+<div>
+
+<div class="section">
+
+  <div class="label">Patente</div>
+
+  <select class="patente" id="patenteSelect" data-save="patente" onchange="updateInventoryLimits()">
+    <option value="recruta">Recruta</option>
+    <option value="operador">Operador</option>
+    <option value="agente">Agente Especial</option>
+    <option value="oficial">Oficial de operações</option>
+    <option value="elite">Agente de Elite</option>
+  </select>
+
+</div>
+
+<div class="inventory-limits">
+
+  <div>Categoria  I: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat1">/ <span id="limit-itemI">2</span></div>
+  <div>Categoria II: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat2">/ <span id="limit-itemII">0</span></div>
+  <div>Categoria III: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat3">/ <span id="limit-itemIII">0</span></div>
+  <div>Categoria IV: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat4">/ <span id="limit-itemIV">0</span></div>
+
+</div>
+
+</div>
+<div class="section">
+  <div>
+    <div class="item-row" style="width:85%; margin-left: 15px; text-align: center;">
+          <h2 title="Nome do item">Item</h2>
+          <h2 title="Cada personagem pode possuir um certo número de itens de cada categoria dependendo da sua patente, mas pode ter quantos itens quiser de categoria 0">Categoria</h2>
+          <h2 title="Cada item ocupa uma quantidade de espaços dependendo de seu tamanho e peso, por padrão, seu máximo de espaços é igual a 5 vezes a sua força (ou 2 caso sua força seja 0)">Espaços</h2>
+    </div> 
+  <div class="accordion accordion-custom" id="accordionExample">
+    <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#item${itemCount}">
+        
+        <div class="item-row" style="width:100%">
+          <input class="editable" disabled placeholder="Novo Item">
+          <input class="editable" disabled value="I">
+          <input class="editable" disabled value="1">
+        </div>
+
+      </button>
+    </h2>
+
+    <div id="item${itemCount}" class="accordion-collapse collapse">
+      <div class="accordion-body">
+        <textarea class="editable" disabled placeholder="Descrição do item"></textarea>
+        <button class="remove-item" onclick="this.closest('.accordion-item').remove()">
+          Remover item
+        </button>
+      </div>
+   
+    </div>
+
+  </div>
+</div>
+
+<button class="edit-btn" onclick="addItem()">Adicionar Item</button>
+  </div>
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/edit.js"></script>
+<script src="js/additem.js"></script>
+<script src="js/patente.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+
+</body>
+</html>
