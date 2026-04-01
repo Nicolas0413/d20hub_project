@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela de Signup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+</head>
+<body>
+    <fieldset>
+        <h1>Cadastro</h1>
+        {% if erro %}
+            <p style="color: red;">{{ erro }}</p>
+        {% endif %}
+        {% if sucesso %}
+            <p style="color: green;">{{ sucesso }}</p>
+        {% endif %}
+        <form action="/signup" method="POST">
+            <label for="login">Login:</label>
+            <input type="text" id="login" name="login" required> <br>
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" name="senha" required><br>
+            <button id="enviar" type="submit">Enviar</button> <br>
+            <button id="apagar" type="reset">Apagar</button>
+        </form>
+        <p>Já tem conta? <a href="/login">Faça login</a></p>
+    </fieldset>
+</body>
+</html>

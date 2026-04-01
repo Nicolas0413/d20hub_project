@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+</head>
+<body>
+    <h1>Menu</h1>
+    <p>Olá, {{ usuario }}! Seja bem vindo.</p>
+    <fieldset>
+        <p><a href="/listar">Ver usuários cadastrados</a></p>
+        <p><a href="/d20/" target="_blank">Abrir Ficha RPG D20</a></p>
+        <p><a href="/logout">Sair</a></p>
+    </fieldset>
+</body>
+</html>
