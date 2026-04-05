@@ -1,6 +1,26 @@
 <!DOCTYPE html>
     <html lang="pt-BR">
     <head>
+    <script>
+       // Obtém o ID da ficha da URL
+    function getFichaId() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('id') || 'default';
+    }
+
+    const fichaId = getFichaId();
+    window.STORAGE_KEY = "fichaRPG_" + fichaId; // Define a chave dinâmica para storage.js
+
+    // Atualiza links para incluir ?id=
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('a[href]').forEach(a => {
+            const href = a.getAttribute('href');
+            if (href && href.endsWith('.html') && !href.includes('?')) {
+                a.href = href + '?id=' + fichaId;
+            }
+        });
+    });
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha RPG</title>
@@ -15,7 +35,7 @@
 
 <div class="sheet" >
 <div style="margin-bottom: 10px; text-align: center;">
-  <a class="btn btn-outline-primary" href="index.html">Ficha</a>
+  <a class="btn btn-outline-primary" href="ficha.html">Ficha</a>
   <a class="btn btn-outline-primary" href="pericias.html">Pericias</a>
   <a class="btn btn-outline-primary" href="habilidades.html">Habilidades</a>
   <a class="btn btn-outline-primary" href="inventario.html">Inventário</a>

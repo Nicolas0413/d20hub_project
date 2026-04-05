@@ -54,7 +54,7 @@ function saveAttacks(){
     });
   });
 
-  localStorage.setItem("attacks", JSON.stringify(attacks));
+  localStorage.setItem(window.STORAGE_KEY + "_attacks", JSON.stringify(attacks));
 }
 
 // =======================
@@ -62,7 +62,7 @@ function saveAttacks(){
 // =======================
 
 function loadAttacks(){
-  const data = localStorage.getItem("attacks");
+  const data = localStorage.getItem(window.STORAGE_KEY + "_attacks");
   if(!data) return;
 
   const attacks = JSON.parse(data);

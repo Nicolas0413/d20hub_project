@@ -1,10 +1,12 @@
-const STORAGE_KEY = "fichaRPG";
+const STORAGE_KEY =  window.STORAGE_KEY || "fichaRPG";
+console.log('STORAGE_KEY:', STORAGE_KEY);
 
 /* ======================
    SALVAR CAMPO
 ====================== */
 
 function saveField(key, value) {
+  console.log('Saving to STORAGE_KEY:', STORAGE_KEY, 'key:', key, 'value:', value);
   const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
   data[key] = value;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -17,6 +19,7 @@ function saveField(key, value) {
 function loadField(el) {
   const data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
   const key = el.dataset.save;
+  console.log('Loading from STORAGE_KEY:', STORAGE_KEY, 'key:', key, 'value:', data[key]);
 
   if (!(key in data)) return;
 

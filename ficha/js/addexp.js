@@ -65,7 +65,7 @@ function saveExpertises(){
     });
   });
 
-  localStorage.setItem("expertises", JSON.stringify(list));
+  localStorage.setItem(window.STORAGE_KEY + "_expertises", JSON.stringify(list));
 }
 
 // ========================
@@ -74,7 +74,7 @@ function saveExpertises(){
 
 function loadExpertises(){
 
-  const data = localStorage.getItem("expertises");
+  const data = localStorage.getItem(window.STORAGE_KEY + "_expertises");
   if(!data) return;
 
   const list = JSON.parse(data);

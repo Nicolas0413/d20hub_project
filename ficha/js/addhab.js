@@ -5,26 +5,26 @@ function uid() {
   return "id" + Date.now() + Math.floor(Math.random() * 1000);
 }
 
-const INVENTORY_KEY = "inventario";
+const HAB_KEY = window.STORAGE_KEY + "_habilidades";
 
 // ==========================
-// CARREGAR ITENS
+// CARREGAR
 // ==========================
-function loadItems() {
-  const data = localStorage.getItem(INVENTORY_KEY);
+function loadHabilities() {
+  const data = localStorage.getItem(window.STORAGE_KEY + "_habilidades");
   if (!data) return;
 
   const list = JSON.parse(data);
   const container = document.getElementById("accordionExample");
   container.innerHTML = "";
 
-  list.forEach(item => addItem(item));
+  list.forEach(hab => addHability(hab));
 }
 
 // ==========================
-// SALVAR ITENS
+// SALVAR
 // ==========================
-function saveItems() {
+function saveHabilities() {
   const list = [];
 
   document.querySelectorAll(".accordion-item").forEach(item => {
@@ -33,19 +33,19 @@ function saveItems() {
 
     list.push({
       nome: inputs[0].value,
-      categoria: inputs[1].value,
-      espacos: inputs[2].value,
+      custo: inputs[1].value,
+      pagina: inputs[2].value,
       descricao: textarea.value
     });
   });
 
-  localStorage.setItem(INVENTORY_KEY, JSON.stringify(list));
+  localStorage.setItem(window.STORAGE_KEY + "_habilidades", JSON.stringify(list));
 }
 
 // ==========================
-// ADICIONAR ITEM
+// ADICIONAR
 // ==========================
-function addItem(data = {}) {
+function addHability(data = {}) {
 
   const id = uid();
   const container = document.getElementById("accordionExample");
@@ -58,24 +58,24 @@ function addItem(data = {}) {
         data-bs-toggle="collapse"
         data-bs-target="#${id}">
         <div class="item-row" style="width:100%">
-          <input class="editable" disabled value="${data.nome || "Novo Item"}">
-          <input class="editable" disabled value="${data.categoria || "I"}">
-          <input class="editable" disabled value="${data.espacos || "1"}">
+          <input class="editable" disabled value="${data.nome || "Nova Habilidade"}">
+          <input class="editable" disabled value="${data.custo || "0"}">
+          <input class="editable" disabled value="${data.pagina || "0"}">
         </div>
       </button>
     </h2>
 
     <div id="${id}" class="accordion-collapse collapse">
       <div class="accordion-body">
-        <textarea class="editable" disabled placeholder="Descrição do item">${data.descricao || ""}</textarea>
-        <button class="remove-item">Remover item</button>
+        <textarea class="editable" disabled placeholder="Descrição da habilidade">${data.descricao || ""}</textarea>
+        <button class="remove-item">Remover</button>
       </div>
     </div>
 
   </div>
   `);
 
-  saveItems();
+  saveHabilities();
 }
 
 // ==========================
@@ -83,15 +83,27 @@ function addItem(data = {}) {
 // ==========================
 document.addEventListener("input", e => {
   if (e.target.closest(".accordion-item")) {
-    saveItems();
+    saveHabilities();
   }
 });
 
 document.addEventListener("click", e => {
   if (e.target.classList.contains("remove-item")) {
     e.target.closest(".accordion-item").remove();
-    saveItems();
+    saveHabilities();
   }
 });
 
-window.addEventListener("load", loadItems);
+window.addEventListener("load", loadHabilities);
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("addHabBtn");
+  if (btn) {
+    btn.addEventListener("click", addHability);
+  }
+});
+
+
+document.addEventListener("click", e => {
+  console.log("CLIQUE:", e.target);
+});
