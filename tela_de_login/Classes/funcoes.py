@@ -12,6 +12,12 @@ class Funcoes:
         user = Usuario(login, senha)
         connect = sqlite3.connect(self.db_path)
         cursor = connect.cursor()
+        cursor.execute("SELECT login FROM usuarios")
+        usuarios = cursor.fetchall() 
+        for i in usuarios:
+            if i[0] == login:
+                connect.close()
+                return False
         cursor.execute('''
         INSERT INTO usuarios (login, senha)
         VALUES (?, ?)
