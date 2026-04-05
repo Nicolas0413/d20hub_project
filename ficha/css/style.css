@@ -476,6 +476,14 @@ textarea {
   --bs-btn-hover-bg: #35007c;
 }
 
+#retornar { 
+  --bs-btn-color: #fff;
+  --bs-btn-border-color: #de312b;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #a00303;
+  margin-left: 8px;
+}
+
 .btn{
   --bs-btn-padding-y: .40rem; 
   --bs-btn-padding-x: .5rem; 
@@ -563,3 +571,4 @@ textarea {
 .editing .image-wrapper::after {
   opacity: 1;
 }
+
