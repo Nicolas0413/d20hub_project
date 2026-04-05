@@ -10,8 +10,12 @@
 <body>
     <div class="toolbar">
         <h2 id="contadorFichas">Fichas: 0/15</h2>
-        <button class="novaficha" id="criarFicha">Criar ficha</button>
-        <button class="novaficha" id="limparFichas">Limpar fichas</button>
+
+        <div class="botoesToolbar">
+            <!--<button class="novaficha" id="retornar" onclick="retornar()">Retornar</button>-->
+            <button class="novaficha" id="limparFichas">Limpar fichas</button>
+            <button class="novaficha" id="criarFicha">Criar ficha</button>
+        </div>
     </div>
     
     <div id="fichasContainer"></div>
@@ -135,6 +139,11 @@
             fichasContainer.innerHTML = '';
         }
 });
+
+    /*function retornar() {
+        confirm("Deseja retornar ao menu? Certifique-se de que abriu o programa.py para retornar, caso contrário o menu não executará adequadamente.") 
+            window.location.href = "tela_de_login/templates/menu.html";
+    }*/
 </script>
 </body>
 </html>
