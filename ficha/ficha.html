@@ -26,7 +26,7 @@
     <title>Ficha RPG</title>
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style1.css" id="tema">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
 </head>
@@ -125,16 +125,16 @@
   <button class="edit-btn" onclick="addAttack()">Adicionar ataque</button>
 </div>
 
-<button class="btn btn-success" onclick="exportFichaCSV()">
+<button class="btn btn-success export" onclick="exportFichaCSV()">
   <i class="bi bi-download"></i> Exportar Ficha
 </button>
 
 <input type="file" id="importCSV" accept=".csv" hidden>
-<button class="btn btn-primary" onclick="document.getElementById('importCSV').click()">
+<button class="btn btn-primary import" onclick="document.getElementById('importCSV').click()">
   <i class="bi bi-upload"></i> Importar Ficha
 </button>
 
-<a href="../index.html"><button class="btn" id="retornar">Retornar</button></a>
+<a href="../index.html" class="ama"><button class="btn" id="retornar">Retornar</button></a>
 
 <div class="dice-control">
 
