@@ -8,6 +8,14 @@ from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
 funcoes = Funcoes()
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Acces-Control-Allow-Origin"] = "*"
+    response.headers["Acces-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Acces-Control-Allow-Headers"] = "Content-Type"
+    return response
+
 app.secret_key = "slamanitoteviraai" #Chave de segurança pro session conseguir salvar do jeito certo
 
 # Inicializar tabela uma única vez na inicialização
@@ -102,7 +110,4 @@ def d20_static(filename):
     return send_from_directory(d20_dir, filename)
 
 if __name__ == "__main__":
-    app.run(debug=True, use_reloader=False)
-
-
-    
+    app.run(debug=True, use_reloader=False, host="0.0.0.0", port=5000)
