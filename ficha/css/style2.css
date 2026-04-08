@@ -638,7 +638,7 @@ button {
 button:hover {
     cursor: pointer;
     background-color: rgb(247, 40, 40);
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: 0px 0px 5px 5px rgb(131, 21, 2);
 }
 
