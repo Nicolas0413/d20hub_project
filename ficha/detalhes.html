@@ -1,40 +1,13 @@
 <!DOCTYPE html>
     <html lang="pt-BR">
     <head>
-    <script>
-       // Obtém o ID da ficha da URL
-    function getFichaId() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('id') || 'default';
-    }
-
-    const fichaId = getFichaId();
-    window.STORAGE_KEY = "fichaRPG_" + fichaId; // Define a chave dinâmica para storage.js
-
-    // Atualiza links para incluir ?id=
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('a[href]').forEach(a => {
-            const href = a.getAttribute('href');
-            if (href && href.endsWith('.html') && !href.includes('?')) {
-                a.href = href + '?id=' + fichaId;
-            }
-        });
-    });
-    </script>
+    <script src="js/fichacarregar.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha RPG</title>
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <script>
-      const tema = localStorage.getItem("tema") || "style1";
-
-      if (tema === "style2") {
-        document.write('<link rel="stylesheet" href="css/style2.css">');
-      } else {
-        document.write('<link rel="stylesheet" href="css/style1.css">');
-      }
-    </script>
+    <script src="js/pegartema.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
 </head>
