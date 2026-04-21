@@ -7,7 +7,8 @@ body {
 h2 {
     margin-left: 5vw;
     display: inline-block;
-    font-size: 1.7vw;
+    font-size: 14px;
+    width: 20px;
     margin-bottom: 10vh;
 }
 
@@ -18,7 +19,7 @@ h2, button {
 button {
     background-color: rgb(192, 33, 33);
     color: rgb(247, 237, 237);
-    padding: 20px;
+    padding: 8px;
     padding-bottom: 8px;
     padding-top: 8px;
     border: none;
@@ -47,7 +48,7 @@ button:active {
     flex-direction: column;
     align-items: center;
     margin-top: 1vh;
-    width: 27vw;
+    width: 400px;
     background-color: #141414;
     padding-bottom: 16px;
     padding-top: 16px;
@@ -64,9 +65,9 @@ button:active {
     display: flex;
     flex-wrap: wrap;
     gap: 6vw;
-    width: 98vw;
-    justify-content: flex-start;
-    margin-left: 2vw;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
 }
 
 .inputficha {
@@ -145,7 +146,6 @@ body {
 }
 
 .toolbar button {
-    margin-right: 2vw;
     float: right
 }
 
