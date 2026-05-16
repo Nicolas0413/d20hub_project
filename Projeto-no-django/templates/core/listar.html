@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Usuários</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/scripts.js' %}" defer></script>
+</head>
+<body>
+    <fieldset>
+        <h1>Lista de Usuários</h1>
+
+        {% if usuarios %}
+            <table border="1" cellpadding="6" cellspacing="0">
+                <thead>
+                    <tr><th>ID</th><th>Username</th></tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                        <tr>
+                            <td>{{ usuario.id }}</td>
+                            <td>{{ usuario.username }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Nenhum usuário encontrado.</p>
+        {% endif %}
+
+        <p><a href="{% url 'core:home' %}">Voltar ao menu</a></p>
+    </fieldset>
+</body>
+</html>

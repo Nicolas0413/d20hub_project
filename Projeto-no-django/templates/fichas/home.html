@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D20HUB</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/fichas_home.css' %}">
+    <script src="{% static 'js/scripts.js' %}?v=1.0" defer></script>
+    <script>
+        const csrftoken = '{{ csrf_token }}';
+    </script>
+</head>
+<body>
+    <div class="toolbar">
+        <h2 id="contadorFichas">Fichas: 0/15</h2>
+        <div class="botoesToolbar">
+            <!--<button class="novaficha" id="retornar" onclick="retornar()">Retornar</button>-->
+            <button class="novaficha" id="limparFichas">Limpar fichas</button>
+            <button class="novaficha" id="criarFicha">Criar ficha</button>
+        </div>
+    </div>
+
+    <div id="fichasContainer">
+
+    </div>
+    
+</body>
+</html>

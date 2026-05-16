@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D20HUB</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/ficha.css' %}?v=1.1">
+  <script src="{% static 'js/scripts.js' %}?v=1.0" defer></script>
+  <script>
+    const csrftoken = '{{ csrf_token }}';
+  </script>
+</head>
+
+<body>
+<div class="sheet">
+<div style="margin-bottom: 10px; text-align: center;">
+  <a class="btn btn-outline-primary" href="ficha.html">Ficha</a>
+  <a class="btn btn-outline-primary" href="pericias.html">Pericias</a>
+  <a class="btn btn-outline-primary" href="habilidades.html">Habilidades</a>
+  <a class="btn btn-outline-primary" href="inventario.html">Inventário</a>
+  <a class="btn btn-outline-primary" href="detalhes.html">Detalhes</a>
+</div>
+<div class="top">
+  <div class="image-wrapper">
+    <img src="{% static 'img/Aguiar.jpg' %}" data-save="pfp" class="photo" id="charImage">
+    <input type="file" id="imageInput" accept="image/*" hidden>
+  </div>
+
+  <div class="info">
+    <div class="name-row">
+      <input class="editable name" disabled placeholder="Nome do personagem" data-save="nome">
+
+      <button class="edit-icon" id="editBtn"> <!-- onclick="toggleEdit()" -->
+        <i class="bi bi-pencil-square"></i>
+      </button>
+    </div>
+
+    <div class="level">
+      <span title="Nex">Nex</span><input class="editable" disabled placeholder="40" data-save="Nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
+      Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Combatente" data-save="classe">
+        
+    </div>
+    <div class="level">
+      Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Aniquilador" data-save="Trilha">
+      Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" placeholder="Acadêmico" data-save="origem">
+    </div>
+  </div>
+</div>
+<div class="section">
+  <div>
+    <div class="item-row"  style="width:85%; margin-left: 15px; text-align: center;">
+          <h2 title="Nome da habilidade">Habilidade</h2>
+          <h2 title="Custo para ativar a habilidade, geralmente pago em PE (Pontos de Esforço) ou PD (Pontos de Determinação)">Custo</h2>
+          <h2 title="Página do livro de regras em que é possivel encontrar uma descrição detalhada da habilidade">Página</h2>
+    </div> 
+  <div class="accordion accordion-custom" id="accordionExample"></div>
+  
+</div>
+
+<button class="edit-btn" id="addHabBtn">Adicionar Habilidade</button>
+
+<!--
+<button class="edit-btn" onclick="addHability()">Adicionar Habilidade</button>
+-->
+</div>
+</div>
+
+
+
+
+</body>
+
+
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D20HUB</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/ficha/ficha.css' %}?v=1.2">
+  <script src="{% static 'js/scripts.js' %}?v=1.0" defer></script>
+  <script>
+    const csrftoken = '{{ csrf_token }}';
+  </script>
+</head>
+
+<body>
+  <div class="sheet" >
+    <div style="margin-bottom: 10px; text-align: center;">
+      <a class="btn btn-outline-primary" href="http://127.0.0.1:8000/fichas/90/ficha">Ficha</a>
+      <a class="btn btn-outline-primary" href="http://127.0.0.1:8000/fichas/90/pericias">Pericias</a>
+      <a class="btn btn-outline-primary" href="http://127.0.0.1:8000/fichas/90/habilidades">Habilidades</a>
+      <a class="btn btn-outline-primary" href="http://127.0.0.1:8000/fichas/90/inventario">Inventário</a>
+      <a class="btn btn-outline-primary" href="http://127.0.0.1:8000/fichas/90/detalhes">Detalhes</a>
+    </div>
+  <div class="top">
+      <div class="image-wrapper">
+        <img src="{% static 'img/Aguiar.jpg' %}" data-save="pfp" class="photo" id="charImage">
+        <input type="file" id="imageInput" accept="image/*" hidden>
+      </div>
+      <div class="info">
+        <div class="name-row">
+          <input class="editable name" disabled placeholder="Nome do personagem" data-save="nome">
+          <button class="edit-icon" id="editBtn"> <!-- onclick="toggleEdit()"  -->
+            <i class="bi bi-pencil-square"></i>
+          </button>
+        </div>
+        <div class="level">
+          <span title="Nex">Nex</span><input class="editable" disabled placeholder="40" data-save="Nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
+          Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Combatente" data-save="classe">    
+        </div>
+        <div class="level">
+          Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Aniquilador" data-save="Trilha">
+          Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" placeholder="Acadêmico" data-save="origem">
+        </div>
+      </div>
+  </div>
+
+
+  <div class="attributes">
+    <div class="attr" title="Força">FOR<input class="editable" value="1" disabled type="number" data-save="FOR"></div>
+    <div class="attr" title="Agilidade">AGI<input class="editable" value="1" disabled type="number" data-save="AGI"></div>
+    <div class="attr" title="intelecto">INT<input class="editable" value="1" disabled type="number" data-save="INT"></div>
+    <div class="attr" title="Preseça">PRE<input class="editable" value="1" disabled type="number" data-save="PRE"></div>
+    <div class="attr" title="Vigor">VIG<input class="editable" value="1" disabled type="number" data-save="VIG"></div>
+  </div>
+
+
+  <div class="section">
+    <div class="label">VIDA</div>
+    <div class="stat">
+      <input class="editable" disabled id="pvAtual" type="number" value="63" data-save="pvAtual" style="width:60px;"> <!-- oninput="updateBar('pv')" -->
+      /
+      <input class="editable" disabled id="pvMax" type="number" value="63" data-save="pvMax" style="width: 60px; text-align: right;"> <!-- oninput="updateBar('pv')" -->
+    </div>
+    <div class="bar-bg"><div class="bar" id="pvBar"></div></div>
+  </div>
+
+  <div class="section">
+    <div class="label">DETERMINAÇÃO</div>
+    <div class="stat">
+      <input class="editable" disabled id="detAtual" type="number" value="34" data-save="detAtual" style="width:60px;"> <!-- oninput="updateBar('det')" -->
+      /
+      <input class="editable" disabled id="detMax" type="number" value="34" data-save="detMax" style="width:60px; text-align: right;"> <!-- oninput="updateBar('det')" -->
+    </div>
+    <div class="bar-bg"><div class="bar" id="detBar"></div></div>
+  </div>
+
+  <div class="section defenses">
+    <div>
+      <div class="label">DEFESA</div>
+      <input class="editable" disabled type="number" value="17" data-save="defesa">
+    </div>
+    <div>
+      <div class="label">ESQUIVA</div>
+      <input class="editable" disabled type="number" value="17" data-save="esquiva">
+    </div>
+    <div>
+      <div class="label">BLOQUEIO</div>
+      <input class="editable" disabled type="number" value="10" data-save="bloqueio">
+    </div>
+  </div>
+
+
+  <div class="section">
+    <div>
+      <table width="100%">
+        <td class="list" width="111.68">Ataque</td>
+        <td class="list" width="111.68">Dano</td>
+        <td class="listend" width="111.68">Crítico</td>
+      </table>  
+    </div>
+    <div class="attacks" id="attacks"></div>
+    <button class="edit-btn">Adicionar ataque</button> <!-- onclick="addAttack()" -->
+  </div>
+
+  <button class="btn btn-success export"> <!-- onclick="exportFichaCSV()" -->
+    <i class="bi bi-download"></i> Exportar Ficha
+  </button>
+
+  <input type="file" id="importCSV" accept=".csv" hidden>
+  <button class="btn btn-primary import"> <!-- onclick="document.getElementById('importCSV').click()" -->
+    <i class="bi bi-upload"></i> Importar Ficha
+  </button>
+
+  <a href="../" class="ama"><button class="btn" id="retornar">Retornar</button></a>
+
+  <div class="dice-control">
+
+
+    <input id="diceQtd" value="1" min="1" style="width:20px;">
+    
+
+    <select class="dice" id="diceType">
+      <option value="4">d4</option>
+      <option value="6">d6</option>
+      <option value="8" selected>d8</option>
+      <option value="10">d10</option>
+      <option value="12">d12</option>
+      <option value="20">d20</option>
+      <option value="100">d100</option>
+    </select>
+
+
+    +<input id="diceBonus"  value="0" style="width:35px;" title="Bônus">
+
+
+    <button class="dice"> <!-- onclick="rollFromInputs()" -->
+      <i class="bi bi-dice-6"></i> 
+    </button>
+
+  </div>
+
+  <div id="dice-result" class="dice-result"></div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela de Login</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/scripts.js' %}" defer></script>
+</head>
+<body>
+    <fieldset>
+        <div class="tudo">
+            <h1>Login</h1>
+            {% if erro %}
+                <p style="color: red;">{{ erro }}</p>
+            {% endif %}
+            {% if sucesso %}
+                <p style="color: green;">{{ sucesso }}</p>
+            {% endif %}
+            <form action="/contas/login/" method="POST">
+                {% csrf_token %}
+                <label for="login">Login:</label>
+                <input type="text" id="login" name="login" required placeholder="Digite seu login"> <br>
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" name="senha" required placeholder="Digite sua senha"><br>
+                <div class="botoes">
+                    <button id="enviar" type="submit">Enviar</button> <br>
+                    <button id="apagar" type="reset">Apagar</button>
+                </div>
+            </form>
+            <p>Não tem conta? <a href="/contas/signup/">Cadastre-se</a></p>
+        </div>
+    </fieldset>
+</body>
+</html>
