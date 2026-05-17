@@ -15,4 +15,5 @@ urlpatterns = [
     path('<int:ficha_id>/habilidades/', views.habilidades_ficha_view, name='habilidades_ficha'),
     path('<int:ficha_id>/inventario/', views.inventario_ficha_view, name='inventario_ficha'),
     path('<int:ficha_id>/detalhes/', views.detalhes_ficha_view, name='detalhes_ficha'),
+    path('<int:ficha_id>/salvar/', views.salvar_ficha_view, name='salvar_ficha'),
 ]

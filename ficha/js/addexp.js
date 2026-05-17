@@ -88,7 +88,7 @@ function loadExpertises(){
 // AUTO SAVE
 // ========================
 
-document.addEventListener("input", e=>{
+document.addEventListener("input", e =>{
   if(e.target.closest("#attacks")){
     saveExpertises();
   }

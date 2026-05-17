@@ -58,7 +58,7 @@ function criarDivFicha(id, nome) {
         fetch(`/fichas/${id}/excluir/`, {
             method: "POST",
             headers: {
-                "X-CSRFToken": csrftoken
+                "X-CSRFToken": window.csrftoken
             }
         })
         .then(res => res.json())

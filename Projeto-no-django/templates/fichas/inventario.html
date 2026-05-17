@@ -4,118 +4,120 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>D20HUB</title>
   {% load static %}
+  <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
+  <title>D20HUB</title>
   <link rel="stylesheet" href="{% static 'css/ficha.css' %}?v=1.1">
-  <script src="{% static 'js/scripts.js' %}?v=1.0" defer></script>
+  <script src="{% static 'js/ficha.js' %}?v=1.1" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <script>
-    const csrftoken = '{{ csrf_token }}';
+    window.csrftoken = '{{ csrf_token }}';
   </script>
 </head>
-
 <body>
-<div class="sheet">
-<div style="margin-bottom: 10px; text-align: center;">
-  <a class="btn btn-outline-primary" href="ficha.html">Ficha</a>
-  <a class="btn btn-outline-primary" href="pericias.html">Pericias</a>
-  <a class="btn btn-outline-primary" href="habilidades.html">Habilidades</a>
-  <a class="btn btn-outline-primary" href="inventario.html">Inventário</a>
-  <a class="btn btn-outline-primary" href="detalhes.html">Detalhes</a>
-</div>
-
-<div class="top">
-  <div class="image-wrapper">
-    <img src="{% static 'img/Aguiar.jpg' %}" data-save="pfp" class="photo" id="charImage">
-    <input type="file" id="imageInput" accept="image/*" hidden>
-  </div>
-
-  <div class="info">
-    <div class="name-row">
-      <input class="editable name" disabled placeholder="Nome do personagem" data-save="nome">
-
-      <button class="edit-icon" id="editBtn"> <!-- onclick="toggleEdit()" -->
-        <i class="bi bi-pencil-square"></i>
-      </button>
+<div class="sheet" data-id="{{ ficha.id }}">
+  <header>
+    <div style="margin-bottom: 10px; text-align: center;">
+      <a class="btn btn-outline-primary" href="{% url 'fichas:ler_ficha' ficha.id %}">Ficha</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:pericias_ficha' ficha.id %}">Pericias</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:habilidades_ficha' ficha.id %}">Habilidades</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:inventario_ficha' ficha.id %}">Inventário</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:detalhes_ficha' ficha.id %}">Detalhes</a>
     </div>
-
-    <div class="level">
-      <span title="Nex">Nex</span><input class="editable" disabled placeholder="40" data-save="Nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
-      Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Combatente" data-save="classe">
-        
-    </div>
-    <div class="level">
-      Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Aniquilador" data-save="Trilha">
-      Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" placeholder="Acadêmico" data-save="origem">
-    </div>
-  </div>
-</div>
-
-
-<div>
-
-<div class="section">
-
-  <div class="label">Patente</div>
-
-  <select class="patente" id="patenteSelect" data-save="patente"> <!-- onchange="updateInventoryLimits()" -->
-    <option value="recruta">Recruta</option>
-    <option value="operador">Operador</option>
-    <option value="agente">Agente Especial</option>
-    <option value="oficial">Oficial de operações</option>
-    <option value="elite">Agente de Elite</option>
-  </select>
-
-</div>
-
-<div class="inventory-limits">
-
-  <div>Categoria  I: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat1">/ <span id="limit-itemI">2</span></div>
-  <div>Categoria II: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat2">/ <span id="limit-itemII">0</span></div>
-  <div>Categoria III: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat3">/ <span id="limit-itemIII">0</span></div>
-  <div>Categoria IV: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat4">/ <span id="limit-itemIV">0</span></div>
-
-</div>
-
-</div>
-<div class="section">
-  <div>
-    <div class="item-row" style="width:85%; margin-left: 15px; text-align: center;">
-          <h2 title="Nome do item">Item</h2>
-          <h2 title="Cada personagem pode possuir um certo número de itens de cada categoria dependendo da sua patente, mas pode ter quantos itens quiser de categoria 0">Categoria</h2>
-          <h2 title="Cada item ocupa uma quantidade de espaços dependendo de seu tamanho e peso, por padrão, seu máximo de espaços é igual a 5 vezes a sua força (ou 2 caso sua força seja 0)">Espaços</h2>
-    </div> 
-  <div class="accordion accordion-custom" id="accordionExample">
-    <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button" type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#item${itemCount}">
-        
-        <div class="item-row" style="width:100%">
-          <input class="editable" disabled placeholder="Novo Item">
-          <input class="editable" disabled value="I">
-          <input class="editable" disabled value="1">
-        </div>
-
-      </button>
-    </h2>
-
-    <div id="item${itemCount}" class="accordion-collapse collapse">
-      <div class="accordion-body">
-        <textarea class="editable" disabled placeholder="Descrição do item"></textarea>
-        <button class="remove-item" > <!-- onclick="this.closest('.accordion-item').remove()" -->
-          Remover item
-        </button>
+    <div class="top">
+      <div class="image-wrapper">
+        <img src="{{ ficha.foto_personagem.url }}" data-save="foto_personagem" class="photo" id="charImage">
+        <input type="file" id="imageInput" accept="image/*" hidden data-save="foto_personagem">
       </div>
-   
+      <div class="info">
+        <div class="name-row">
+          {% if ficha.personagem == '' %}
+            <input class="editable name" disabled placeholder="Nome do personagem" data-save="personagem">
+          {% else %}
+            <input class="editable name" disabled value="{{ ficha.personagem }}" data-save="personagem">
+          {% endif %}
+          <button class="edit-icon" id="editBtn" onclick="editar()">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+        </div>
+        <div class="level">
+          {% if ficha.nex %}
+            <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
+          {% else %}
+            <span title="Nex">Nex</span><input class="editable" disabled placeholder="40" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
+          {% endif %}
+
+          {% if ficha.classe == '' %}
+            Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Combatente" data-save="classe">    
+          {% else %}
+            Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.classe }}" data-save="classe">    
+          {% endif %}
+        </div>
+        <div class="level">
+          {% if ficha.trilha == '' %}
+            Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Aniquilador" data-save="trilha">
+          {% else %}
+            Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha">
+          {% endif %}
+          {% if ficha.origem == '' %}
+            Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" placeholder="Acadêmico" data-save="origem">
+          {% else %}
+            Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
+          {% endif %}
+        </div>
+      </div>
     </div>
+  </header>
 
+  <div class="section">
+    <div class="label">Patente</div>
+      <select class="patente" id="patenteSelect" data-save="patente"> <!-- onchange="updateInventoryLimits()" -->
+        <option value="recruta">Recruta</option>
+        <option value="operador">Operador</option>
+        <option value="agente">Agente Especial</option>
+        <option value="oficial">Oficial de operações</option>
+        <option value="elite">Agente de Elite</option>
+      </select>
+    </div>
+    <div class="inventory-limits">
+      <div>Categoria  I: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat1">/ <span id="limit-itemI">2</span></div>
+      <div>Categoria II: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat2">/ <span id="limit-itemII">0</span></div>
+      <div>Categoria III: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat3">/ <span id="limit-itemIII">0</span></div>
+      <div>Categoria IV: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat4">/ <span id="limit-itemIV">0</span></div>
+    </div>
+    <div class="section">
+    <div>
+      <div class="item-row" style="width:85%; margin-left: 15px; text-align: center;">
+            <h2 title="Nome do item">Item</h2>
+            <h2 title="Cada personagem pode possuir um certo número de itens de cada categoria dependendo da sua patente, mas pode ter quantos itens quiser de categoria 0">Categoria</h2>
+            <h2 title="Cada item ocupa uma quantidade de espaços dependendo de seu tamanho e peso, por padrão, seu máximo de espaços é igual a 5 vezes a sua força (ou 2 caso sua força seja 0)">Espaços</h2>
+      </div> 
+      <div class="accordion accordion-custom" id="accordionExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button" type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#item${itemCount}">
+              <div class="item-row" style="width:100%">
+                <input class="editable" disabled placeholder="Novo Item">
+                <input class="editable" disabled value="I">
+                <input class="editable" disabled value="1">
+              </div>
+            </button>
+          </h2>
+          <div id="item${itemCount}" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              <textarea class="editable" disabled placeholder="Descrição do item"></textarea>
+              <button class="remove-item" > <!-- onclick="this.closest('.accordion-item').remove()" -->
+                Remover item
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="edit-btn">Adicionar Item</button> <!-- onclick="addItem()" -->
+    </div>
   </div>
-</div>
-
-<button class="edit-btn">Adicionar Item</button> <!-- onclick="addItem()" -->
-  </div>
-</div>
 
 
 </body>
