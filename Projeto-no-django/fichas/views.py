@@ -2,7 +2,7 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from .models import Estatisticas, Ficha
+from .models import Estatisticas, Ficha, Pericia, TreinamentoFichaPericia
 
 @login_required
 def home_fichas_view(request):
@@ -38,6 +38,8 @@ def editar_nome_ficha_view(request, ficha_id):
         ficha.save()
         return JsonResponse({"status": True})
     
+
+
 @login_required
 def fichas_usuario_view(request):
     fichas = Ficha.objects.filter(usuario=request.user)
@@ -48,26 +50,6 @@ def fichas_usuario_view(request):
 def ler_ficha_view(request, ficha_id):
     ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
     return render(request, 'fichas/ficha.html', {'ficha': ficha})
-
-@login_required
-def pericias_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    return render(request, 'fichas/pericias.html', {'ficha': ficha})
-
-@login_required
-def habilidades_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    return render(request, 'fichas/habilidades.html', {'ficha': ficha})
-
-@login_required
-def inventario_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    return render(request, 'fichas/inventario.html', {'ficha': ficha})
-
-@login_required
-def detalhes_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    return render(request, 'fichas/detalhes.html', {'ficha': ficha})
 
 @login_required
 def salvar_ficha_view(request, ficha_id):
@@ -88,3 +70,46 @@ def salvar_ficha_view(request, ficha_id):
         setattr(ficha, campo, valor)
         ficha.save()
         return JsonResponse({"status": True})
+    
+
+
+@login_required
+def pericias_ficha_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    return render(request, 'fichas/pericias.html', {'ficha': ficha})
+
+@login_required
+def criar_pericia_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    if request.method == 'POST':
+        pericia = Pericia.objects.create()
+        TreinamentoFichaPericia.objects.create(ficha=ficha, pericia=pericia) 
+        return JsonResponse({"status": True})
+    
+@login_required
+def salvar_pericia_view(request, pericia_id):
+    pericia = get_object_or_404(Pericia, id=pericia_id, usuario=request.user)
+    dados = json.loads(request.body)
+    campo = dados.get('campo')
+    valor = dados.get('valor')
+    setattr(pericia, campo, valor)
+    pericia.save()
+    return JsonResponse({"status": True})
+
+
+
+@login_required
+def habilidades_ficha_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    return render(request, 'fichas/habilidades.html', {'ficha': ficha})
+
+@login_required
+def inventario_ficha_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    return render(request, 'fichas/inventario.html', {'ficha': ficha})
+
+@login_required
+def detalhes_ficha_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    return render(request, 'fichas/detalhes.html', {'ficha': ficha})
+

@@ -6,6 +6,11 @@ document.addEventListener("change", evento =>{
     if (alvo.classList.contains("naoficha")) {
         return;
     }
+
+    if (alvo.classList.contains("pericia")){
+        salvarPericia(alvo, pericia_id) // Colocar para enviar o bagulho certo já
+    }
+
     salvarFicha(alvo);
 });
 
@@ -53,5 +58,47 @@ function salvarFicha(input) {
     });
 }
 
+function addPericia() {
+    fetch(`/fichas/${fichaId}/pericias/criar`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": window.csrftoken
+        },
+        body: JSON.stringify({
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.status) {
+            alert("Erro ao criar pericia! Tente novamente.");
+        }
+    });
+}
+
+function salvarPericia(input, pericia_id) {
+   const valorAtual = input.value.trim();
+    const campo = input.dataset.save;
+    fetch(`/fichas/${pericia_id}/pericia/salvar`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": window.csrftoken
+        },
+        body: JSON.stringify({
+            campo: campo,   
+            valor: valorAtual
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.mensagem) {
+            alert(data.mensagem);
+        }
+        if (!data.status) {
+            alert("Erro ao salvar a ficha! Tente novamente.");
+        }
+    }); 
+}
 
 

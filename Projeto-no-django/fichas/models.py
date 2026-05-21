@@ -51,7 +51,7 @@ class Pericia(models.Model):
 
 class TreinamentoFichaPericia(models.Model):
     ficha = models.ForeignKey(Ficha, on_delete=models.CASCADE, related_name="treinamentos_pericias")
-    pericia = models.ForeignKey('Pericia', on_delete=models.CASCADE)
+    pericia = models.ForeignKey(Pericia, on_delete=models.CASCADE)
     dados = models.IntegerField(null=True, blank=True)
     treinamento = models.CharField(max_length=128, null=True, blank=True)
     bonus = models.IntegerField(null=True, blank=True)
