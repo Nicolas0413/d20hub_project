@@ -4,18 +4,17 @@ from django.conf import settings
 class Ficha(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="fichas")
     nome = models.CharField(max_length=64, default="")
-    personagem = models.CharField(max_length=64, default="")
+    personagem = models.CharField(max_length=64, default="Nome do personagem")
     foto_personagem = models.ImageField(upload_to='fotos_fichas/', default="fotos_fichas/Aguiar.jpg")
-    nex = models.IntegerField(null=True, blank=True)
-    classe = models.CharField(max_length=32, default="")
-    trilha = models.CharField(max_length=32, default="")
-    origem = models.CharField(max_length=32, default="")
-    habilidades = models.ManyToManyField('Habilidade', blank=True)
+    nex = models.IntegerField(null=True, blank=True, default=40)
+    classe = models.CharField(max_length=32, default="Combatente")
+    trilha = models.CharField(max_length=32, default="Aniquilador")
+    origem = models.CharField(max_length=32, default="Acadêmico")
     pericias = models.ManyToManyField('Pericia', through='TreinamentoFichaPericia', blank=True)
     inventario = models.ManyToManyField('Item', blank=True)
-    anotacoes = models.TextField(default="")
-    aparencia = models.TextField(default="")
-    historia = models.TextField(default="")
+    anotacoes = models.TextField(default="Anotoções gerais sobre o personagem e missões")
+    aparencia = models.TextField(default="Descrição física do personagem como: genêro, idade, altura etc.")
+    historia = models.TextField(default="História do personagem (de onde veio, qual seu objetivo etc.)")
     token_personagem = models.ImageField(upload_to='token_personagens/', default="token_personagens/Aguiar_corpo.png")
 
     def __str__(self):
@@ -66,6 +65,7 @@ class Ataque(models.Model):
         return self.nome
 
 class Habilidade(models.Model):
+    ficha = models.ForeignKey(Ficha, on_delete=models.CASCADE, related_name="habilidades")
     nome = models.CharField(max_length=128, default="")
     descricao = models.TextField(default="")
     pagina = models.CharField(max_length=128, default="")

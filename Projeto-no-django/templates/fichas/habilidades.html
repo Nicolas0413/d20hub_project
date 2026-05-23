@@ -17,82 +17,71 @@
 
 <body>
 <div class="sheet" data-id="{{ ficha.id }}">
-    <header>
-      <div style="margin-bottom: 10px; text-align: center;">
-        <a class="btn btn-outline-primary" href="{% url 'fichas:ler_ficha' ficha.id %}">Ficha</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:pericias_ficha' ficha.id %}">Pericias</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:habilidades_ficha' ficha.id %}">Habilidades</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:inventario_ficha' ficha.id %}">Inventário</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:detalhes_ficha' ficha.id %}">Detalhes</a>
+  <header>
+    <div style="margin-bottom: 10px; text-align: center;">
+      <a class="btn btn-outline-primary" href="{% url 'fichas:ler_ficha' ficha.id %}">Ficha</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:pericias_ficha' ficha.id %}">Pericias</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:habilidades_ficha' ficha.id %}">Habilidades</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:inventario_ficha' ficha.id %}">Inventário</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:detalhes_ficha' ficha.id %}">Detalhes</a>
+    </div>
+    <div class="top">
+      <div class="image-wrapper">
+        <img src="{{ ficha.foto_personagem.url }}" data-save="foto_personagem" class="photo" id="charImage">
+        <input type="file" id="imageInput" accept="image/*" hidden data-save="foto_personagem">
       </div>
-      <div class="top">
-        <div class="image-wrapper">
-          <img src="{{ ficha.foto_personagem.url }}" data-save="foto_personagem" class="photo" id="charImage">
-          <input type="file" id="imageInput" accept="image/*" hidden data-save="foto_personagem">
+      <div class="info">
+        <div class="name-row">
+          <input class="editable name" disabled value="{{ ficha.personagem }}" data-save="personagem">
+          <button class="edit-icon" id="editBtn" onclick="editar()">
+            <i class="bi bi-pencil-square"></i>
+          </button>
         </div>
-        <div class="info">
-          <div class="name-row">
-            {% if ficha.personagem == '' %}
-              <input class="editable name" disabled placeholder="Nome do personagem" data-save="personagem">
-            {% else %}
-              <input class="editable name" disabled value="{{ ficha.personagem }}" data-save="personagem">
-            {% endif %}
-            <button class="edit-icon" id="editBtn" onclick="editar()">
-              <i class="bi bi-pencil-square"></i>
-            </button>
-          </div>
-          <div class="level">
-            {% if ficha.nex %}
-              <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
-            {% else %}
-              <span title="Nex">Nex</span><input class="editable" disabled placeholder="40" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
-            {% endif %}
-      
-            {% if ficha.classe == '' %}
-              Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Combatente" data-save="classe">    
-            {% else %}
-              Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.classe }}" data-save="classe">    
-            {% endif %}
-          </div>
-          <div class="level">
-            {% if ficha.trilha == '' %}
-              Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Aniquilador" data-save="trilha">
-            {% else %}
-              Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha">
-            {% endif %}
-            {% if ficha.origem == '' %}
-              Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" placeholder="Acadêmico" data-save="origem">
-            {% else %}
-              Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
-            {% endif %}
-          </div>
+        <div class="level">
+          <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
+          Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.classe }}" data-save="classe">    
+        </div>
+        <div class="level">
+          Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha">
+          Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
         </div>
       </div>
-    </header>
+    </div>
+  </header>
 
-<div class="section">
-  <div>
-    <div class="item-row"  style="width:85%; margin-left: 15px; text-align: center;">
-          <h2 title="Nome da habilidade">Habilidade</h2>
+  <div class="section">
+    <div>
+      <div class="item-row"  style="width:85%; margin-left: 15px; text-align: center;">
+        <h2 title="Nome da habilidade">Habilidade</h2>
           <h2 title="Custo para ativar a habilidade, geralmente pago em PE (Pontos de Esforço) ou PD (Pontos de Determinação)">Custo</h2>
           <h2 title="Página do livro de regras em que é possivel encontrar uma descrição detalhada da habilidade">Página</h2>
-    </div> 
-  <div class="accordion accordion-custom" id="accordionExample"></div>
-  
+      </div> 
+      <div class="accordion accordion-custom" id="accordionExample">
+        {% for habilidade in ficha.habilidades.all %}
+          <table width="100%">
+            <td class="atk" width="111.68">
+              <input id="nome-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.nome }}" data-save="nome">
+            </td>
+            <td class="atk" width="111.68">
+              <input id="custo-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.custo }}" data-save="custo">
+            </td>
+            <td class="atk2" width="111.68">
+              <input id="pagina-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.pagina }}" data-save="pagina">
+            </td>
+          </table>
+          <div id="{{ habilidade.id }}" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              <textarea id="descricao-{{ habilidade.id }}" class="editable habilidade" disabled placeholder="Descrição da habilidade" data-save="descricao">{{ habilidade.descricao }}</textarea>
+              <button class="remove-item" onclick="removerHabilidade('{{ habilidade.id }}')">Remover</button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <button class="edit-btn" id="addHabBtn" onclick="addHabilidade()">Adicionar Habilidade</button>
+    
+  </div>
 </div>
-
-<button class="edit-btn" id="addHabBtn">Adicionar Habilidade</button>
-
-<!--
-<button class="edit-btn" onclick="addHability()">Adicionar Habilidade</button>
--->
-</div>
-</div>
-
-
-
 
 </body>
-
-
 </html>

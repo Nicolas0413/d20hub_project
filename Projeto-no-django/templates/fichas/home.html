@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/fichas_home.css' %}">
     <script src="{% static 'js/scripts.js' %}?v=1.0" defer></script>
     <script>
-        const csrftoken = '{{ csrf_token }}';
+        window.csrftoken = '{{ csrf_token }}';
     </script>
 </head>
 <body>

@@ -17,333 +17,63 @@
 
 <body>
 <div class="sheet" data-id="{{ ficha.id }}">
-    <header>
-      <div style="margin-bottom: 10px; text-align: center;">
-        <a class="btn btn-outline-primary" href="{% url 'fichas:ler_ficha' ficha.id %}">Ficha</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:pericias_ficha' ficha.id %}">Pericias</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:habilidades_ficha' ficha.id %}">Habilidades</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:inventario_ficha' ficha.id %}">Inventário</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:detalhes_ficha' ficha.id %}">Detalhes</a>
+  <header>
+    <div style="margin-bottom: 10px; text-align: center;">
+      <a class="btn btn-outline-primary" href="{% url 'fichas:ler_ficha' ficha.id %}">Ficha</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:pericias_ficha' ficha.id %}">Pericias</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:habilidades_ficha' ficha.id %}">Habilidades</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:inventario_ficha' ficha.id %}">Inventário</a>
+      <a class="btn btn-outline-primary" href="{% url 'fichas:detalhes_ficha' ficha.id %}">Detalhes</a>
+    </div>
+    <div class="top">
+      <div class="image-wrapper">
+        <img src="{{ ficha.foto_personagem.url }}" data-save="foto_personagem" class="photo" id="charImage">
+        <input type="file" id="imageInput" accept="image/*" hidden data-save="foto_personagem">
       </div>
-      <div class="top">
-        <div class="image-wrapper">
-          <img src="{{ ficha.foto_personagem.url }}" data-save="foto_personagem" class="photo" id="charImage">
-          <input type="file" id="imageInput" accept="image/*" hidden data-save="foto_personagem">
+      <div class="info">
+        <div class="name-row">
+          <input class="editable name" disabled value="{{ ficha.personagem }}" data-save="personagem">
+          <button class="edit-icon" id="editBtn" onclick="editar()">
+            <i class="bi bi-pencil-square"></i>
+          </button>
         </div>
-        <div class="info">
-          <div class="name-row">
-            {% if ficha.personagem == '' %}
-              <input class="editable name" disabled placeholder="Nome do personagem" data-save="personagem">
-            {% else %}
-              <input class="editable name" disabled value="{{ ficha.personagem }}" data-save="personagem">
-            {% endif %}
-            <button class="edit-icon" id="editBtn" onclick="editar()">
-              <i class="bi bi-pencil-square"></i>
-            </button>
-          </div>
-          <div class="level">
-            {% if ficha.nex %}
-              <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
-            {% else %}
-              <span title="Nex">Nex</span><input class="editable" disabled placeholder="40" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
-            {% endif %}
-      
-            {% if ficha.classe == '' %}
-              Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Combatente" data-save="classe">    
-            {% else %}
-              Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.classe }}" data-save="classe">    
-            {% endif %}
-          </div>
-          <div class="level">
-            {% if ficha.trilha == '' %}
-              Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Aniquilador" data-save="trilha">
-            {% else %}
-              Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha">
-            {% endif %}
-            {% if ficha.origem == '' %}
-              Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" placeholder="Acadêmico" data-save="origem">
-            {% else %}
-              Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
-            {% endif %}
-          </div>
+        <div class="level">
+          <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
+          Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.classe }}" data-save="classe">    
+        </div>
+        <div class="level">
+          Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha">
+          Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
         </div>
       </div>
-    </header>
+    </div>
+  </header>
 
+  <div class="section">
+    <div>
+      <table width="100%">
+        <th class="list" width="40%" title="Nome da perícia">Perícia</th>
+        <th class="list" width="20%" title="Atributo base da perícia, jogue uma quantidade de dados igual seu valor do atributo e pegue o maior">Dados</th>
+        <th class="list" width="20%" title="Bônus total que será somado ao dado que você tirou, Bônus = Treino + Bônus de itens">Bônus</th>
+        <th class="listend" width="20%" title="O valor base que seu personagem soma ao rolar testes de pericia, varia entre 5, 10 e 15">Treino</th>
+      </table>  
+    </div>
 
-<div class="section">
-  <div>
-    <table width="100%">
-      <th class="list" width="40%" title="Nome da perícia">Perícia</th>
-      <th class="list" width="20%" title="Atributo base da perícia, jogue uma quantidade de dados igual seu valor do atributo e pegue o maior">Dados</th>
-      <th class="list" width="20%" title="Bônus total que será somado ao dado que você tirou, Bônus = Treino + Bônus de itens">Bônus</th>
-      <th class="listend" width="20%" title="O valor base que seu personagem soma ao rolar testes de pericia, varia entre 5, 10 e 15">Treino</th>
-    </table>  
+    <div class="attacks" id="attacks">
+        {% for pericia in ficha.treinamentos_pericias.all %} 
+          <div class="attack">
+            <table width="100%">
+              <td class="list" width="40%"><input id="nome.{{ pericia.pericia.id }}" class="editable pericia" style="text-align: left;" disabled value="{{pericia.pericia.nome}}" data-save="pericia.nome" ></td>
+              <td class="list" width="20%"><input id="dados.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.dados}}" data-save="dados"></td>
+              <td class="list" width="20%"><input  id="bonus.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.bonus}}" data-save="bonus"></td>
+              <td class="listend" width="20%"><input id="treinamento.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.treinamento}}" data-save="treinamento"></td>
+            </table>
+            <button onclick="removerPericia('{{ pericia.pericia.id }}')">Remover</button>
+          </div> 
+        {% endfor %}
+    </div>
+    <button class="edit-btn" onclick="addPericia()">Adicionar Perícia</button>
   </div>
-
-  <div class="attacks" id="attacks">
-      {% for pericia in ficha.treinamentos_pericias.all %} 
-        <div class="attack">
-          <table width="100%">
-            <td class="list" width="40%"><input id="nome.{{ pericia.pericia.id }}" class="editable pericia" style="text-align: left;" disabled value="{{pericia.pericia.nome}}" data-save="pericia.nome" ></td>
-            <td class="list" width="20%"><input id="dados.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.dados}}" data-save="dados"></td>
-            <td class="list" width="20%"><input  id="bonus.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.bonus}}" data-save="bonus"></td>
-            <td class="listend" width="20%"><input id="treinamento.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.treinamento}}" data-save="treinamento"></td>
-          </table>
-          <button onclick="removerPericia('{{ pericia.pericia.id }}')">Remover</button>
-        </div> 
-      {% endfor %}
-  </div>
-  <button class="edit-btn" onclick="addPericia()">Adicionar Perícia</button>
-</div>
-
 </div>
 
 
-
-<!--
-  </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Adestramento"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Artes"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Atletismo"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Atualidades"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Ciências"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Crime"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Diplomacia"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Enganação"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Fortitude"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Furtividade"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Iniciativa"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Intimidação"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Intuição"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Investigação"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Luta"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Medicina"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Ocultismo"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Percepção"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Pilotagem"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Pontaria"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Profissão ()"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Reflexos"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Religião"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Sobrevivência"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Tática"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Tecnologia"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" --
-    </div>
-    <div class="attack">
-    <table width="100%">
-      <td class="list" width="40%"><input class="editable" style="text-align: left;" disabled value="Vontade"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="1"></td>
-      <td class="list" width="20%"><input class="editable" disabled value="0"></td>
-      <td class="listend" width="20%"><input class="editable" disabled value="0"></td>
-    </table>
-    <button>Remover</button> <-- onclick="this.parentElement.remove()" -->
-</body>
-</html>

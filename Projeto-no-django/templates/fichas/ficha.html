@@ -32,39 +32,18 @@
         </div>
         <div class="info">
           <div class="name-row">
-            {% if ficha.personagem == '' %}
-              <input class="editable name" disabled placeholder="Nome do personagem" data-save="personagem">
-            {% else %}
-              <input class="editable name" disabled value="{{ ficha.personagem }}" data-save="personagem">
-            {% endif %}
+            <input class="editable name" disabled value="{{ ficha.personagem }}" data-save="personagem">
             <button class="edit-icon" id="editBtn" onclick="editar()">
               <i class="bi bi-pencil-square"></i>
             </button>
           </div>
           <div class="level">
-            {% if ficha.nex %}
-              <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
-            {% else %}
-              <span title="Nex">Nex</span><input class="editable" disabled placeholder="40" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
-            {% endif %}
-      
-            {% if ficha.classe == '' %}
-              Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Combatente" data-save="classe">    
-            {% else %}
-              Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.classe }}" data-save="classe">    
-            {% endif %}
+            <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
+            Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.classe }}" data-save="classe">    
           </div>
           <div class="level">
-            {% if ficha.trilha == '' %}
-              Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Aniquilador" data-save="trilha">
-            {% else %}
-              Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha">
-            {% endif %}
-            {% if ficha.origem == '' %}
-              Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" placeholder="Acadêmico" data-save="origem">
-            {% else %}
-              Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
-            {% endif %}
+            Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha">
+            Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
           </div>
         </div>
       </div>
@@ -75,8 +54,8 @@
     <div class="attributes">
     <div class="attr" title="Força">FOR<input class="editable" value="{{ ficha.estatisticas.forca }}" disabled type="number" data-save="estatisticas.forca"></div>
     <div class="attr" title="Agilidade">AGI<input class="editable" value="{{ ficha.estatisticas.agilidade }}" disabled type="number" data-save="estatisticas.agilidade"></div>
-    <div class="attr" title="intelecto">INT<input class="editable" value="{{ ficha.estatisticas.intelecto }}" disabled type="number" data-save="estatisticas.intelecto"></div>
-    <div class="attr" title="Preseça">PRE<input class="editable" value="{{ ficha.estatisticas.presenca }}" disabled type="number" data-save="estatisticas.presenca"></div>
+    <div class="attr" title="Intelecto">INT<input class="editable" value="{{ ficha.estatisticas.intelecto }}" disabled type="number" data-save="estatisticas.intelecto"></div>
+    <div class="attr" title="Presença">PRE<input class="editable" value="{{ ficha.estatisticas.presenca }}" disabled type="number" data-save="estatisticas.presenca"></div>
     <div class="attr" title="Vigor">VIG<input class="editable" value="{{ ficha.estatisticas.vigor }}" disabled type="number" data-save="estatisticas.vigor"></div>
   </div>
 

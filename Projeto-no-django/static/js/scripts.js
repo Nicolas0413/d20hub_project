@@ -92,7 +92,7 @@ function carregarFichas() {
     });
 }
 
-if (document.getElementById("fichasContainer")) { /* Carrega fichas na página home.html */
+if (document.getElementById("fichasContainer")) { /* se página for home.html */
     carregarFichas();
 
     document.getElementById("criarFicha").addEventListener("click", () => {

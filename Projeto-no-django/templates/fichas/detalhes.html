@@ -32,39 +32,18 @@
         </div>
         <div class="info">
           <div class="name-row">
-            {% if ficha.personagem == '' %}
-              <input class="editable name" disabled placeholder="Nome do personagem" data-save="personagem">
-            {% else %}
-              <input class="editable name" disabled value="{{ ficha.personagem }}" data-save="personagem">
-            {% endif %}
+            <input class="editable name" disabled value="{{ ficha.personagem }}" data-save="personagem">
             <button class="edit-icon" id="editBtn" onclick="editar()">
               <i class="bi bi-pencil-square"></i>
             </button>
           </div>
           <div class="level">
-            {% if ficha.nex %}
-              <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
-            {% else %}
-              <span title="Nex">Nex</span><input class="editable" disabled placeholder="40" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
-            {% endif %}
-
-            {% if ficha.classe == '' %}
-              Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Combatente" data-save="classe">    
-            {% else %}
-              Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.classe }}" data-save="classe">    
-            {% endif %}
+            <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
+            Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.classe }}" data-save="classe">    
           </div>
           <div class="level">
-            {% if ficha.trilha == '' %}
-              Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" placeholder="Aniquilador" data-save="trilha">
-            {% else %}
-              Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha">
-            {% endif %}
-            {% if ficha.origem == '' %}
-              Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" placeholder="Acadêmico" data-save="origem">
-            {% else %}
-              Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
-            {% endif %}
+            Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha">
+            Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
           </div>
         </div>
       </div>
@@ -72,25 +51,11 @@
 
     <div>
       <h2>Anotações:</h2> 
-      {% if ficha.anotacoes == '' %}
-        <textarea class="editable" disabled placeholder="Anotoções gerais sobre o personagem e missões" data-save="anotacoes"></textarea>
-      {% else %}
-        <textarea class="editable" disabled data-save="anotacoes">{{ ficha.anotacoes }}</textarea>
-      {% endif %}
-
+      <textarea class="editable" disabled data-save="anotacoes">{{ ficha.anotacoes }}</textarea>
       <h2>Aparência:</h2>
-      {% if ficha.aparencia == '' %}
-        <textarea class="editable" disabled placeholder="Descrição físca do personagem como: genêro, idade, altura etc." data-save="aparencia"></textarea>
-      {% else %}
-        <textarea class="editable" disabled data-save="aparencia">{{ ficha.aparencia }}</textarea>
-      {% endif %}
-
+      <textarea class="editable" disabled data-save="aparencia">{{ ficha.aparencia }}</textarea>
       <h2>História:</h2>
-      {% if ficha.historia == '' %}
-        <textarea class="editable" disabled placeholder="História do personagem (de onde veio, qual seu objetivo etc.)" data-save="historia"></textarea>
-      {% else %}
-        <textarea class="editable" disabled data-save="historia">{{ ficha.historia }}</textarea>
-      {% endif %}
+      <textarea class="editable" disabled data-save="historia">{{ ficha.historia }}</textarea>
     </div>
 
     <div style="text-align: center;">

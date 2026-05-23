@@ -2,7 +2,7 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from .models import Estatisticas, Ficha, Pericia, TreinamentoFichaPericia
+from .models import Estatisticas, Ficha, Pericia, TreinamentoFichaPericia, Habilidade, Item, Ataque
 
 @login_required
 def home_fichas_view(request):
@@ -71,7 +71,12 @@ def salvar_ficha_view(request, ficha_id):
         ficha.save()
         return JsonResponse({"status": True})
     
-
+@login_required
+def detalhes_ficha_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    return render(request, 'fichas/detalhes.html', {'ficha': ficha})
+    
+# Pericias CRUD
 
 @login_required
 def pericias_ficha_view(request, ficha_id):
@@ -127,6 +132,7 @@ def salvar_pericia_view(request, pericia_id):
         return JsonResponse({"status": True})
     
 
+# Habilidades CRUD
 
 @login_required
 def habilidades_ficha_view(request, ficha_id):
@@ -134,12 +140,40 @@ def habilidades_ficha_view(request, ficha_id):
     return render(request, 'fichas/habilidades.html', {'ficha': ficha})
 
 @login_required
+def criar_habilidade_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    if request.method == 'POST':
+        Habilidade.objects.create(ficha=ficha)
+        return JsonResponse({"status": True})
+    
+@login_required
+def remover_habilidade_view(request, habilidade_id):
+    habilidade = get_object_or_404(Habilidade, id=habilidade_id, ficha__usuario=request.user)
+    if request.method == 'POST':
+        habilidade.delete()
+        return JsonResponse({"status": True})
+    
+@login_required
+def salvar_habilidade_view(request, habilidade_id):
+    habilidade = get_object_or_404(Habilidade, id=habilidade_id, ficha__usuario=request.user)
+    campos_permitidos = ["nome", "descricao", "pagina", "custo"]
+    if request.method == 'POST':
+        dados = json.loads(request.body)
+        campo = dados.get('campo')
+        valor = dados.get('valor')
+        if campo not in campos_permitidos:
+            return JsonResponse({"status": False, "mensagem": "Campo invalido."})
+        setattr(habilidade, campo, valor)
+        habilidade.save()
+        return JsonResponse({"status": True})
+
+
+
+
+@login_required
 def inventario_ficha_view(request, ficha_id):
     ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
     return render(request, 'fichas/inventario.html', {'ficha': ficha})
 
-@login_required
-def detalhes_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    return render(request, 'fichas/detalhes.html', {'ficha': ficha})
+
 

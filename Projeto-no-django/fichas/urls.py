@@ -20,6 +20,11 @@ urlpatterns = [
 
 
     path('<int:ficha_id>/habilidades/', views.habilidades_ficha_view, name='habilidades_ficha'),
+    path('<int:ficha_id>/habilidade/criar/', views.criar_habilidade_view, name='criar_habilidade'),
+    path('<int:habilidade_id>/habilidade/salvar/', views.salvar_habilidade_view, name='salvar_habilidade'),
+    path('<int:habilidade_id>/habilidade/remover/', views.remover_habilidade_view, name='remover_habilidade'),
+
+
     path('<int:ficha_id>/inventario/', views.inventario_ficha_view, name='inventario_ficha'),
     path('<int:ficha_id>/detalhes/', views.detalhes_ficha_view, name='detalhes_ficha'),
     path('<int:ficha_id>/salvar/', views.salvar_ficha_view, name='salvar_ficha'),
