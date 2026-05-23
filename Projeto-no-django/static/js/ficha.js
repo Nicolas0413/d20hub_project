@@ -1,17 +1,19 @@
 window.edit = false;
+
 const fichaId = document.querySelector(".sheet").dataset.id;
 
 document.addEventListener("change", evento =>{
     const alvo = evento.target;
     if (alvo.classList.contains("naoficha")) {
         return;
-    }
+    };
 
     if (alvo.classList.contains("pericia")){
-        salvarPericia(alvo, pericia_id) // Colocar para enviar o bagulho certo já
-    }
-
+        const periciaId = alvo.id.split(".")[1];
+        salvarPericia(alvo, periciaId);
+    } else {
     salvarFicha(alvo);
+    };
 });
 
 function editar() {
@@ -59,7 +61,7 @@ function salvarFicha(input) {
 }
 
 function addPericia() {
-    fetch(`/fichas/${fichaId}/pericias/criar`, {
+    fetch(`/fichas/${fichaId}/pericia/criar/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -73,13 +75,40 @@ function addPericia() {
         if (!data.status) {
             alert("Erro ao criar pericia! Tente novamente.");
         }
+    })
+    .then(() => {
+        window.location.reload();
     });
+}
+
+function removerPericia(pericia_id) {
+    fetch(`/fichas/${pericia_id}/pericia/remover/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": window.csrftoken
+        },
+        body: JSON.stringify({
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.mensagem) {
+            alert(data.mensagem);
+        }
+        if (!data.status) {
+            alert("Erro ao remover pericia! Tente novamente.");
+        }
+    })
+    .then(() => {
+        window.location.reload();
+    }); 
 }
 
 function salvarPericia(input, pericia_id) {
    const valorAtual = input.value.trim();
     const campo = input.dataset.save;
-    fetch(`/fichas/${pericia_id}/pericia/salvar`, {
+    fetch(`/fichas/${pericia_id}/pericia/salvar/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -96,7 +125,7 @@ function salvarPericia(input, pericia_id) {
             alert(data.mensagem);
         }
         if (!data.status) {
-            alert("Erro ao salvar a ficha! Tente novamente.");
+            alert("Erro ao salvar pericia! Tente novamente.");
         }
     }); 
 }

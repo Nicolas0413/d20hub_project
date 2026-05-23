@@ -87,15 +87,45 @@ def criar_pericia_view(request, ficha_id):
         return JsonResponse({"status": True})
     
 @login_required
+def remover_pericia_view(request, pericia_id):
+    pericia = get_object_or_404(Pericia, id=pericia_id)
+    treinamento = get_object_or_404(TreinamentoFichaPericia, pericia=pericia, ficha__usuario=request.user)
+    if request.method == 'POST':
+        treinamento.delete()
+        pericia.delete()
+        return JsonResponse({"status": True})
+    
+@login_required
 def salvar_pericia_view(request, pericia_id):
-    pericia = get_object_or_404(Pericia, id=pericia_id, usuario=request.user)
-    dados = json.loads(request.body)
-    campo = dados.get('campo')
-    valor = dados.get('valor')
-    setattr(pericia, campo, valor)
-    pericia.save()
-    return JsonResponse({"status": True})
+    pericia = get_object_or_404(Pericia, id=pericia_id)
+    treinamento = get_object_or_404(TreinamentoFichaPericia, pericia=pericia, ficha__usuario=request.user)
+    campos_permitidos = ["pericia.nome", "descricao", "pagina", "dados", "bonus", "treinamento"]
+    if request.method == 'POST':
+        dados = json.loads(request.body)
+        campo = dados.get('campo')
+        valor = dados.get('valor')
+        if campo not in campos_permitidos:
+            return JsonResponse({"status": False, "mensagem": "Campo invalido."})
+        if campo in ["dados", "bonus"]:
+            try:
+                int_valor = int(valor)
+                setattr(treinamento, campo, int_valor)
+            except ValueError:
+                return JsonResponse({"status": False, "mensagem": "Valor inválido para campo numérico."})
+            treinamento.save()
+            return JsonResponse({"status": True})
+        
+        if campo == "treinamento":
+            setattr(treinamento, campo, valor)
+            treinamento.save()
+            return JsonResponse({"status": True})
 
+        if "." in campo: # Para campo relacionado" 
+            campo = "nome"
+        setattr(pericia, campo, valor)
+        pericia.save()
+        return JsonResponse({"status": True})
+    
 
 
 @login_required

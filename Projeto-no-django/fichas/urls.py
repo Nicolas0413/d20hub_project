@@ -14,9 +14,9 @@ urlpatterns = [
     path('<int:ficha_id>/excluir/', views.excluir_ficha_view, name='excluir_ficha'),
     
     path('<int:ficha_id>/pericias/', views.pericias_ficha_view, name='pericias_ficha'),
-    path('<int:ficha_id>/pericias/criar', views.criar_pericia_view, name='criar_pericia'),
-    path('<int:ficha_id>/pericias/salvar', views.salvar_pericia_view, name='salvar_pericia'),
-
+    path('<int:ficha_id>/pericia/criar/', views.criar_pericia_view, name='criar_pericia'),
+    path('<int:pericia_id>/pericia/salvar/', views.salvar_pericia_view, name='salvar_pericia'),
+    path('<int:pericia_id>/pericia/remover/', views.remover_pericia_view, name='remover_pericia'),
 
 
     path('<int:ficha_id>/habilidades/', views.habilidades_ficha_view, name='habilidades_ficha'),
