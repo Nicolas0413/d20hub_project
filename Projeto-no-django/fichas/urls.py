@@ -12,6 +12,7 @@ urlpatterns = [
     path('<int:ficha_id>/', views.ler_ficha_view, name='ler_ficha'),
     path('<int:ficha_id>/editar/nome/', views.editar_nome_ficha_view, name='editar_nome_ficha'),
     path('<int:ficha_id>/excluir/', views.excluir_ficha_view, name='excluir_ficha'),
+    path('<int:ficha_id>/salvar/', views.salvar_ficha_view, name='salvar_ficha'),
     
     path('<int:ficha_id>/pericias/', views.pericias_ficha_view, name='pericias_ficha'),
     path('<int:ficha_id>/pericia/criar/', views.criar_pericia_view, name='criar_pericia'),
@@ -26,6 +27,10 @@ urlpatterns = [
 
 
     path('<int:ficha_id>/inventario/', views.inventario_ficha_view, name='inventario_ficha'),
+    path('<int:ficha_id>/item/criar/', views.criar_item_view, name='criar_item'),
+    path('<int:item_id>/item/salvar/', views.salvar_item_view, name='salvar_item'),
+    path('<int:item_id>/item/remover/', views.remover_item_view, name='remover_item'),
+
+
     path('<int:ficha_id>/detalhes/', views.detalhes_ficha_view, name='detalhes_ficha'),
-    path('<int:ficha_id>/salvar/', views.salvar_ficha_view, name='salvar_ficha'),
 ]

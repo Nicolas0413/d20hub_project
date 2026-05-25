@@ -63,12 +63,12 @@
         {% for pericia in ficha.treinamentos_pericias.all %} 
           <div class="attack">
             <table width="100%">
-              <td class="list" width="40%"><input id="nome.{{ pericia.pericia.id }}" class="editable pericia" style="text-align: left;" disabled value="{{pericia.pericia.nome}}" data-save="pericia.nome" ></td>
-              <td class="list" width="20%"><input id="dados.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.dados}}" data-save="dados"></td>
-              <td class="list" width="20%"><input  id="bonus.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.bonus}}" data-save="bonus"></td>
-              <td class="listend" width="20%"><input id="treinamento.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.treinamento}}" data-save="treinamento"></td>
+              <td class="list" width="40%"><input id="nome.{{ pericia.pericia.id }}" class="editable pericia" style="text-align: left;" disabled value="{{pericia.pericia.nome}}" data-save="pericia.nome" data-pericia-id="{{ pericia.pericia.id }}"></td>
+              <td class="list" width="20%"><input id="dados.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.dados}}" data-save="dados" data-pericia-id="{{ pericia.pericia.id }}"></td>
+              <td class="list" width="20%"><input  id="bonus.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.bonus}}" data-save="bonus" data-pericia-id="{{ pericia.pericia.id }}"></td>
+              <td class="listend" width="20%"><input id="treinamento.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.treinamento}}" data-save="treinamento" data-pericia-id="{{ pericia.pericia.id }}"></td>
             </table>
-            <button onclick="removerPericia('{{ pericia.pericia.id }}')">Remover</button>
+            <button data-pericia-id="{{ pericia.pericia.id }}" onclick="removerPericia('{{ pericia.pericia.id }}')">Remover</button>
           </div> 
         {% endfor %}
     </div>

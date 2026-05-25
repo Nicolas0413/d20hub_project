@@ -11,9 +11,9 @@ class Ficha(models.Model):
     trilha = models.CharField(max_length=32, default="Aniquilador")
     origem = models.CharField(max_length=32, default="Acadêmico")
     pericias = models.ManyToManyField('Pericia', through='TreinamentoFichaPericia', blank=True)
-    inventario = models.ManyToManyField('Item', blank=True)
-    anotacoes = models.TextField(default="Anotoções gerais sobre o personagem e missões")
-    aparencia = models.TextField(default="Descrição física do personagem como: genêro, idade, altura etc.")
+    patente = models.CharField(max_length=32, default="Recruta")
+    anotacoes = models.TextField(default="Anotações gerais sobre o personagem e missões")
+    aparencia = models.TextField(default="Descrição física do personagem como: gênero, idade, altura etc.")
     historia = models.TextField(default="História do personagem (de onde veio, qual seu objetivo etc.)")
     token_personagem = models.ImageField(upload_to='token_personagens/', default="token_personagens/Aguiar_corpo.png")
 
@@ -73,12 +73,25 @@ class Habilidade(models.Model):
 
     def __str__(self):
         return self.nome
+    
+class Inventario(models.Model):
+    ficha = models.OneToOneField(Ficha, on_delete=models.CASCADE, related_name="inventario")
+    carga_atual = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True, default=0)
+    carga_maxima = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True, default=0)
+    cat1 = models.IntegerField(null=True, blank=True, default=0)
+    cat2 = models.IntegerField(null=True, blank=True, default=0)
+    cat3 = models.IntegerField(null=True, blank=True, default=0)
+    cat4 = models.IntegerField(null=True, blank=True, default=0)
+
+    def __str__(self):
+        return f"Inventário de {self.ficha.nome}"
 
 class Item(models.Model):
-    nome = models.CharField(max_length=128, default="")
-    espaco = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    inventario = models.ForeignKey('Inventario', on_delete=models.CASCADE, related_name="itens")
+    nome = models.CharField(max_length=128, default="Nome")
+    espaco = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True, default=1)
+    categoria = models.CharField(max_length=32, default="0")
     descricao = models.TextField(default="")
-    pagina = models.CharField(max_length=128, default="")
 
     def __str__(self):
         return self.nome

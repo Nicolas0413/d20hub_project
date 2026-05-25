@@ -60,19 +60,19 @@
         {% for habilidade in ficha.habilidades.all %}
           <table width="100%">
             <td class="atk" width="111.68">
-              <input id="nome-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.nome }}" data-save="nome">
+              <input id="nome-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.nome }}" data-save="nome" data-habilidade-id="{{ habilidade.id }}">
             </td>
             <td class="atk" width="111.68">
-              <input id="custo-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.custo }}" data-save="custo">
+              <input id="custo-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.custo }}" data-save="custo" data-habilidade-id="{{ habilidade.id }}">
             </td>
             <td class="atk2" width="111.68">
-              <input id="pagina-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.pagina }}" data-save="pagina">
+              <input id="pagina-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.pagina }}" data-save="pagina" data-habilidade-id="{{ habilidade.id }}">
             </td>
           </table>
           <div id="{{ habilidade.id }}" class="accordion-collapse collapse">
             <div class="accordion-body">
-              <textarea id="descricao-{{ habilidade.id }}" class="editable habilidade" disabled placeholder="Descrição da habilidade" data-save="descricao">{{ habilidade.descricao }}</textarea>
-              <button class="remove-item" onclick="removerHabilidade('{{ habilidade.id }}')">Remover</button>
+              <textarea id="descricao-{{ habilidade.id }}" class="editable habilidade" disabled placeholder="Descrição da habilidade" data-save="descricao" data-habilidade-id="{{ habilidade.id }}">{{ habilidade.descricao }}</textarea>
+              <button class="remove-item" data-habilidade-id="{{ habilidade.id }}" onclick="removerHabilidade('{{ habilidade.id }}')">Remover</button>
             </div>
           </div>
         {% endfor %}

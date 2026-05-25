@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
   <title>D20HUB</title>
   <link rel="stylesheet" href="{% static 'css/ficha.css' %}?v=1.1">
-  <script src="{% static 'js/ficha.js' %}?v=1.1" defer></script>
+  <script src="{% static 'js/ficha.js' %}?v=1.7" defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <script>
     window.csrftoken = '{{ csrf_token }}';
@@ -49,21 +49,25 @@
   </header>
 
   <div class="section">
+
     <div class="label">Patente</div>
-      <select class="patente" id="patenteSelect" data-save="patente"> <!-- onchange="updateInventoryLimits()" -->
-        <option value="recruta">Recruta</option>
-        <option value="operador">Operador</option>
-        <option value="agente">Agente Especial</option>
-        <option value="oficial">Oficial de operações</option>
-        <option value="elite">Agente de Elite</option>
+      <select class="patente " id="patenteSelect" data-save="patente" onchange="atualizarPatente()" data-patente="{{ ficha.patente }}">
+        <option value="Recruta">Recruta</option>
+        <option value="Operador">Operador</option>
+        <option value="Agente_Especial">Agente Especial</option>
+        <option value="Oficial_de_Operações">Oficial de operações</option>
+        <option value="Agente_de_Elite">Agente de Elite</option>
       </select>
     </div>
     <div class="inventory-limits">
-      <div>Categoria  I: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat1">/ <span id="limit-itemI">2</span></div>
-      <div>Categoria II: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat2">/ <span id="limit-itemII">0</span></div>
-      <div>Categoria III: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat3">/ <span id="limit-itemIII">0</span></div>
-      <div>Categoria IV: <input class="editable" disabled value="0" style="width: 18px;" data-save="cat4">/ <span id="limit-itemIV">0</span></div>
+      <div>Categoria  I: <input class="editable" disabled value="{{ ficha.inventario.cat1 }}" style="width: 18px;" data-save="inventario.cat1" id="cat1">/ <span id="limit-catI">0</span></div>
+      <div>Categoria II: <input class="editable" disabled value="{{ ficha.inventario.cat2 }}" style="width: 18px;" data-save="inventario.cat2" id="cat2">/ <span id="limit-catII">0</span></div>
+      <div>Categoria III: <input class="editable" disabled value="{{ ficha.inventario.cat3 }}" style="width: 18px;" data-save="inventario.cat3" id="cat3">/ <span id="limit-catIII">0</span></div>
+      <div>Categoria IV: <input class="editable" disabled value="{{ ficha.inventario.cat4 }}" style="width: 18px;" data-save="inventario.cat4" id="cat4">/ <span id="limit-catIV">0</span></div>
     </div>
+    <br>
+    <div>Carga total: <input class="editable" disabled value="{{ ficha.inventario.carga_atual }}" style="width: 18px;" data-save="inventario.carga_atual" id="cargaTotal">/ <input class="editable" disabled value="{{ ficha.inventario.carga_maxima }}" style="width: 18px;" data-save="inventario.carga_maxima" id="carga_maxima"></div>
+
     <div class="section">
     <div>
       <div class="item-row" style="width:85%; margin-left: 15px; text-align: center;">
@@ -71,33 +75,32 @@
             <h2 title="Cada personagem pode possuir um certo número de itens de cada categoria dependendo da sua patente, mas pode ter quantos itens quiser de categoria 0">Categoria</h2>
             <h2 title="Cada item ocupa uma quantidade de espaços dependendo de seu tamanho e peso, por padrão, seu máximo de espaços é igual a 5 vezes a sua força (ou 2 caso sua força seja 0)">Espaços</h2>
       </div> 
-      <div class="accordion accordion-custom" id="accordionExample">
-        <div class="accordion-item">
-          <h2 class="accordion-header">
-            <button class="accordion-button" type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#item${itemCount}">
-              <div class="item-row" style="width:100%">
-                <input class="editable" disabled placeholder="Novo Item">
-                <input class="editable" disabled value="I">
-                <input class="editable" disabled value="1">
-              </div>
-            </button>
-          </h2>
-          <div id="item${itemCount}" class="accordion-collapse collapse">
-            <div class="accordion-body">
-              <textarea class="editable" disabled placeholder="Descrição do item"></textarea>
-              <button class="remove-item" > <!-- onclick="this.closest('.accordion-item').remove()" -->
-                Remover item
+      {% for item in ficha.inventario.itens.all %}
+        <div class="accordion accordion-custom" id="accordionExample">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#item{{ item.id }}">
+                <div class="item-row" style="width:100%">
+                  <input class="editable item" disabled value="{{ item.nome }}" data-save="nome" data-item-id="{{ item.id }}">
+                  <input class="editable item" disabled value="{{ item.categoria }}" data-save="categoria" data-item-id="{{ item.id }}">
+                  <input class="editable item" disabled value="{{ item.espaco }}" data-save="espaco" data-item-id="{{ item.id }}">
+                </div>
               </button>
+            </h2>
+            <div id="item{{ item.id }}" class="accordion-collapse collapse">
+              <div class="accordion-body">
+                <textarea class="editable item" disabled placeholder="Descrição do item" data-save="descricao" data-item-id="{{ item.id }}">{{ item.descricao }}</textarea>
+                <button class="remove-item" data-item-id="{{ item.id }}" onclick="removerItem('{{ item.id }}')">
+                  Remover item
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <button class="edit-btn">Adicionar Item</button> <!-- onclick="addItem()" -->
+      {% endfor %}
+      <button class="edit-btn" onclick="addItem()">Adicionar Item</button>
     </div>
   </div>
-
 
 </body>
 </html>

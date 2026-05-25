@@ -2,7 +2,7 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from .models import Estatisticas, Ficha, Pericia, TreinamentoFichaPericia, Habilidade, Item, Ataque
+from .models import Estatisticas, Ficha, Pericia, TreinamentoFichaPericia, Habilidade, Item, Ataque, Inventario
 
 @login_required
 def home_fichas_view(request):
@@ -14,6 +14,7 @@ def criar_ficha_view(request):
     if request.method == 'POST':
         ficha = Ficha.objects.create(usuario = request.user, nome="")
         Estatisticas.objects.create(ficha=ficha)
+        Inventario.objects.create(ficha=ficha)
         return JsonResponse({"id": ficha.id, "nome": ficha.nome, "status": True})
     
 @login_required
@@ -30,7 +31,7 @@ def excluir_ficha_view(request, ficha_id):
             return JsonResponse({"status": True})
 
 @login_required
-def editar_nome_ficha_view(request, ficha_id):
+def editar_nome_ficha_view(request, ficha_id):  # Dps mudar para quando editar nome na outra tela, rodar o salvar direto e deleta isso
     ficha = get_object_or_404(Ficha, id=ficha_id)
     if request.method == 'POST':
         dados = json.loads(request.body)
@@ -55,21 +56,21 @@ def ler_ficha_view(request, ficha_id):
 def salvar_ficha_view(request, ficha_id):
     ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
     if request.method == 'POST':
-        camposproibidos = ["id", "usuario_id"]
+        campospermidos = ["nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "pericias", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4"]
         dados = json.loads(request.body)
         campo = dados.get('campo')
         valor = dados.get('valor')
-        if campo in camposproibidos:
-            return JsonResponse({"status": False, "mensagem": "Campo proibido."})
-        if "." in campo: # Para campos relacionados" 
-            relacao, campo = campo.split(".")
-            objeto = getattr(ficha, relacao)
-            setattr(objeto, campo, valor)
-            objeto.save()
+        if campo in campospermidos:
+            if "." in campo: # Para campos relacionados" 
+                relacao, campo = campo.split(".")
+                objeto = getattr(ficha, relacao)
+                setattr(objeto, campo, valor)
+                objeto.save()
+                return JsonResponse({"status": True})
+            setattr(ficha, campo, valor)
+            ficha.save()
             return JsonResponse({"status": True})
-        setattr(ficha, campo, valor)
-        ficha.save()
-        return JsonResponse({"status": True})
+        return JsonResponse({"status": False, "mensagem": "Campo Invalido."})
     
 @login_required
 def detalhes_ficha_view(request, ficha_id):
@@ -168,12 +169,39 @@ def salvar_habilidade_view(request, habilidade_id):
         return JsonResponse({"status": True})
 
 
-
+# Inventário CRUD
 
 @login_required
 def inventario_ficha_view(request, ficha_id):
     ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
     return render(request, 'fichas/inventario.html', {'ficha': ficha})
 
+@login_required
+def criar_item_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    if request.method == 'POST':
+        Item.objects.create(inventario=ficha.inventario)
+        return JsonResponse({"status": True})
 
+@login_required
+def remover_item_view(request, item_id):
+    item = get_object_or_404(Item, id=item_id, inventario__ficha__usuario=request.user)
+    if request.method == 'POST':
+        item.delete()
+        return JsonResponse({"status": True})
+
+@login_required
+def salvar_item_view(request, item_id):
+    item = get_object_or_404(Item, id=item_id, inventario__ficha__usuario=request.user)
+    campos_permitidos = ["nome", "categoria", "espaco", "descricao"]
+    if request.method == 'POST':
+        dados = json.loads(request.body)
+        campo = dados.get('campo')
+        valor = dados.get('valor')
+        if campo not in campos_permitidos:
+            return JsonResponse({"status": False, "mensagem": "Campo invalido."})
+        setattr(item, campo, valor)
+        item.save()
+        return JsonResponse({"status": True})
+    
 
