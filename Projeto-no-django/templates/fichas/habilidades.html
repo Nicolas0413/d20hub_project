@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
   <title>D20HUB</title>
   <link rel="stylesheet" href="{% static 'css/ficha.css' %}?v=1.1">
-  <script src="{% static 'js/ficha.js' %}?v=1.1" defer></script>
+  <script src="{% static 'js/ficha.js' %}?v=1.5" defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <script>
     window.csrftoken = '{{ csrf_token }}';
@@ -72,13 +72,13 @@
           <div id="{{ habilidade.id }}" class="accordion-collapse collapse">
             <div class="accordion-body">
               <textarea id="descricao-{{ habilidade.id }}" class="editable habilidade" disabled placeholder="Descrição da habilidade" data-save="descricao" data-habilidade-id="{{ habilidade.id }}">{{ habilidade.descricao }}</textarea>
-              <button class="remove-item" data-habilidade-id="{{ habilidade.id }}" onclick="removerHabilidade('{{ habilidade.id }}')">Remover</button>
+              <button class="remove-item" data-habilidade-id="{{ habilidade.id }}" onclick="remover('habilidade', '{{ habilidade.id }}')">Remover</button>
             </div>
           </div>
         {% endfor %}
       </div>
     </div>
-    <button class="edit-btn" id="addHabBtn" onclick="addHabilidade()">Adicionar Habilidade</button>
+    <button class="edit-btn" id="addHabBtn" onclick="adicionar('habilidade')">Adicionar Habilidade</button>
     
   </div>
 </div>

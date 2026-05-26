@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
   <title>D20HUB</title>
   <link rel="stylesheet" href="{% static 'css/ficha.css' %}?v=1.1">
-  <script src="{% static 'js/ficha.js' %}?v=1.7" defer></script>
+  <script src="{% static 'js/ficha.js' %}?v=1.10" defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <script>
     window.csrftoken = '{{ csrf_token }}';
@@ -90,7 +90,7 @@
             <div id="item{{ item.id }}" class="accordion-collapse collapse">
               <div class="accordion-body">
                 <textarea class="editable item" disabled placeholder="Descrição do item" data-save="descricao" data-item-id="{{ item.id }}">{{ item.descricao }}</textarea>
-                <button class="remove-item" data-item-id="{{ item.id }}" onclick="removerItem('{{ item.id }}')">
+                <button class="remove-item" data-item-id="{{ item.id }}" onclick="remover('item', '{{ item.id }}')">
                   Remover item
                 </button>
               </div>
@@ -98,7 +98,7 @@
           </div>
         </div>
       {% endfor %}
-      <button class="edit-btn" onclick="addItem()">Adicionar Item</button>
+      <button class="edit-btn" onclick="adicionar('item')">Adicionar Item</button>
     </div>
   </div>
 

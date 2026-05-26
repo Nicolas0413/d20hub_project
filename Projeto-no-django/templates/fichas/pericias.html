@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
   <title>D20HUB</title>
   <link rel="stylesheet" href="{% static 'css/ficha.css' %}?v=1.1">
-  <script src="{% static 'js/ficha.js' %}?v=1.0" defer></script>
+  <script src="{% static 'js/ficha.js' %}?v=1.3" defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <script>
     window.csrftoken = '{{ csrf_token }}';
@@ -68,11 +68,11 @@
               <td class="list" width="20%"><input  id="bonus.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.bonus}}" data-save="bonus" data-pericia-id="{{ pericia.pericia.id }}"></td>
               <td class="listend" width="20%"><input id="treinamento.{{ pericia.pericia.id }}" class="editable pericia" disabled value="{{pericia.treinamento}}" data-save="treinamento" data-pericia-id="{{ pericia.pericia.id }}"></td>
             </table>
-            <button data-pericia-id="{{ pericia.pericia.id }}" onclick="removerPericia('{{ pericia.pericia.id }}')">Remover</button>
+            <button data-pericia-id="{{ pericia.pericia.id }}" onclick="remover('pericia', '{{ pericia.pericia.id }}')">Remover</button>
           </div> 
         {% endfor %}
     </div>
-    <button class="edit-btn" onclick="addPericia()">Adicionar Perícia</button>
+    <button class="edit-btn" onclick="adicionar('pericia')">Adicionar Perícia</button>
   </div>
 </div>
 

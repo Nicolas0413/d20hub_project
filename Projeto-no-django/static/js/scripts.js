@@ -15,12 +15,15 @@ function criarDivFicha(id, nome) {
 
     input.addEventListener('blur', () => {
         let nomeAtual = input.value.trim();
-        fetch(`/fichas/${id}/editar/nome/`, {
+        fetch(`/fichas/${id}/ficha/salvar/`, {
             method: "POST",
             headers: {
                 "X-CSRFToken": csrftoken
             },
-            body: JSON.stringify({ nome: nomeAtual })
+            body: JSON.stringify({
+            campo: "nome",   
+            valor: nomeAtual
+        })
         })
         .then(res => res.json())
         .then(data => {
@@ -42,7 +45,7 @@ function criarDivFicha(id, nome) {
     acessarBtn.addEventListener("click", () => {
         const nomeAtual = input.value.trim();
         if (nomeAtual) {
-            window.location.href = `/fichas/${id}/`
+            window.location.href = `/fichas/${id}/ficha/`;
         } else {
                 alert("Por favor, digite um nome para a ficha.");
             }
@@ -55,7 +58,7 @@ function criarDivFicha(id, nome) {
 
     excluirBtn.addEventListener("click", () => {
         if (confirm("Tem certeza que deseja excluir esta ficha?")) {
-        fetch(`/fichas/${id}/excluir/`, {
+        fetch(`/fichas/${id}/ficha/excluir/`, {
             method: "POST",
             headers: {
                 "X-CSRFToken": window.csrftoken

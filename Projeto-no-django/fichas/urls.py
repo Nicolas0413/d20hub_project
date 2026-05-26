@@ -9,11 +9,14 @@ urlpatterns = [
     path('limpar/', views.limpar_fichas_view, name='limpar_fichas'),
     path('usuario/', views.fichas_usuario_view, name='fichas_usuario'),
 
-    path('<int:ficha_id>/', views.ler_ficha_view, name='ler_ficha'),
-    path('<int:ficha_id>/editar/nome/', views.editar_nome_ficha_view, name='editar_nome_ficha'),
-    path('<int:ficha_id>/excluir/', views.excluir_ficha_view, name='excluir_ficha'),
-    path('<int:ficha_id>/salvar/', views.salvar_ficha_view, name='salvar_ficha'),
-    
+    path('<int:ficha_id>/ficha/', views.ler_ficha_view, name='ler_ficha'),
+    path('<int:ficha_id>/ficha/excluir/', views.excluir_ficha_view, name='excluir_ficha'),
+    path('<int:ficha_id>/ficha/salvar/', views.salvar_ficha_view, name='salvar_ficha'),
+
+    path('<int:ficha_id>/ataque/criar/', views.criar_ataque_view, name='criar_ataque'),
+    path('<int:ataque_id>/ataque/salvar/', views.salvar_ataque_view, name='salvar_ataque'),
+    path('<int:ataque_id>/ataque/remover/', views.remover_ataque_view, name='remover_ataque'),
+
     path('<int:ficha_id>/pericias/', views.pericias_ficha_view, name='pericias_ficha'),
     path('<int:ficha_id>/pericia/criar/', views.criar_pericia_view, name='criar_pericia'),
     path('<int:pericia_id>/pericia/salvar/', views.salvar_pericia_view, name='salvar_pericia'),

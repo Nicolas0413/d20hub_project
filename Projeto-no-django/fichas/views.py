@@ -31,17 +31,6 @@ def excluir_ficha_view(request, ficha_id):
             return JsonResponse({"status": True})
 
 @login_required
-def editar_nome_ficha_view(request, ficha_id):  # Dps mudar para quando editar nome na outra tela, rodar o salvar direto e deleta isso
-    ficha = get_object_or_404(Ficha, id=ficha_id)
-    if request.method == 'POST':
-        dados = json.loads(request.body)
-        ficha.nome = dados.get('nome')
-        ficha.save()
-        return JsonResponse({"status": True})
-    
-
-
-@login_required
 def fichas_usuario_view(request):
     fichas = Ficha.objects.filter(usuario=request.user)
     vetor_fichas = [{"id": ficha.id, "nome": ficha.nome} for ficha in fichas]
@@ -77,6 +66,38 @@ def detalhes_ficha_view(request, ficha_id):
     ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
     return render(request, 'fichas/detalhes.html', {'ficha': ficha})
     
+# Ataques CRUD
+
+# Já é lido no ler ficha
+
+@login_required
+def criar_ataque_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    if request.method == 'POST':
+        Ataque.objects.create(ficha=ficha)
+        return JsonResponse({"status": True})
+    
+@login_required
+def remover_ataque_view(request, ataque_id):
+    ataque = get_object_or_404(Ataque, id=ataque_id, ficha__usuario=request.user)
+    if request.method == 'POST':
+        ataque.delete()
+        return JsonResponse({"status": True})
+    
+@login_required
+def salvar_ataque_view(request, ataque_id):
+    ataque = get_object_or_404(Ataque, id=ataque_id, ficha__usuario=request.user)
+    campos_permitidos = ["nome", "dano", "critico"]
+    if request.method == 'POST':
+        dados = json.loads(request.body)
+        campo = dados.get('campo')
+        valor = dados.get('valor')
+        if campo not in campos_permitidos:
+            return JsonResponse({"status": False, "mensagem": "Campo invalido."})
+        setattr(ataque, campo, valor)
+        ataque.save()
+        return JsonResponse({"status": True})
+
 # Pericias CRUD
 
 @login_required

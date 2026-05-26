@@ -27,15 +27,15 @@ class Estatisticas(models.Model):
     vigor = models.IntegerField(default=1)
     intelecto = models.IntegerField(default=1)
     presenca = models.IntegerField(default=1)
-    pv_atual = models.IntegerField(null=True, blank=True)
-    pv_maximos = models.IntegerField(null=True, blank=True)
-    pe_atual = models.IntegerField(null=True, blank=True)
-    pe_maximos = models.IntegerField(null=True, blank=True)
-    sanidade_atual = models.IntegerField(null=True, blank=True)
-    sanidade_maxima = models.IntegerField(null=True, blank=True)
-    defesa = models.IntegerField(null=True, blank=True)
-    esquiva = models.IntegerField(null=True, blank=True)
-    bloqueio = models.IntegerField(null=True, blank=True)
+    pv_atual = models.IntegerField(null=True, blank=True, default=0)
+    pv_maximos = models.IntegerField(null=True, blank=True, default=0)
+    pe_atual = models.IntegerField(null=True, blank=True, default=0)
+    pe_maximos = models.IntegerField(null=True, blank=True, default=0)
+    sanidade_atual = models.IntegerField(null=True, blank=True, default=0)
+    sanidade_maxima = models.IntegerField(null=True, blank=True, default=0)
+    defesa = models.IntegerField(null=True, blank=True, default=0)
+    esquiva = models.IntegerField(null=True, blank=True, default=0)
+    bloqueio = models.IntegerField(null=True, blank=True, default=0)
 
     def __str__(self):
         return f"Estatísticas de {self.ficha.nome}"
@@ -57,9 +57,9 @@ class TreinamentoFichaPericia(models.Model):
 
 class Ataque(models.Model):
     ficha = models.ForeignKey(Ficha, on_delete=models.CASCADE, related_name="ataques")
-    nome = models.CharField(max_length=32, default="")
-    dano = models.CharField(max_length=16, null=True, blank=True)
-    critico = models.CharField(max_length=16, null=True, blank=True)
+    nome = models.CharField(max_length=32, default="Ataque")
+    dano = models.CharField(max_length=16, default="")
+    critico = models.CharField(max_length=16, default="20 x2")
 
     def __str__(self):
         return self.nome

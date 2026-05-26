@@ -23,15 +23,18 @@ document.addEventListener("change", evento =>{
     };
     if (alvo.classList.contains("pericia")){
         const periciaId = alvo.dataset.periciaId;
-        salvarPericia(alvo, periciaId);
+        salvar("pericia", alvo, periciaId);
     } else if (alvo.classList.contains("habilidade")){
         const habilidadeId = alvo.dataset.habilidadeId;
-        salvarHabilidade(alvo, habilidadeId);
+        salvar("habilidade", alvo, habilidadeId);
     } else if (alvo.classList.contains("item")) {
         const itemId = alvo.dataset.itemId;
-        salvarItem(alvo, itemId);
+        salvar("item", alvo, itemId);
+    } else if (alvo.classList.contains("ataque")) {
+        const ataqueId = alvo.dataset.ataqueId;
+        salvar("ataque", alvo, ataqueId);
     } else {
-        salvarFicha(alvo);
+        salvar("ficha", alvo, fichaId);
     }
 });
 
@@ -64,10 +67,10 @@ function editar() {
   }
 }
 
-function salvarFicha(input) {
-    const valorAtual = input.value.trim();
+function salvar(tipo, input, id) {
+    const valor = input.value.trim();
     const campo = input.dataset.save;
-    fetch(`/fichas/${fichaId}/salvar/`, {
+    fetch(`/fichas/${id}/${tipo}/salvar/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -75,7 +78,7 @@ function salvarFicha(input) {
         },
         body: JSON.stringify({
             campo: campo,   
-            valor: valorAtual
+            valor: valor
         })
     })
     .then(res => res.json())
@@ -84,15 +87,13 @@ function salvarFicha(input) {
             alert(data.mensagem);
         }
         if (!data.status) {
-            alert("Erro ao salvar a ficha! Tente novamente.");
+            alert(`Erro ao salvar ${tipo}! Tente novamente.`);
         }
     });
 }
 
-/* Pericias */
-
-function addPericia() {
-    fetch(`/fichas/${fichaId}/pericia/criar/`, {
+function adicionar(tipo) {
+    fetch(`/fichas/${fichaId}/${tipo}/criar/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -104,79 +105,7 @@ function addPericia() {
     .then(res => res.json())
     .then(data => {
         if (!data.status) {
-            alert("Erro ao criar pericia! Tente novamente.");
-        }
-    })
-    .then(() => {
-        window.location.reload();
-    });
-}
-
-function removerPericia(pericia_id) {
-    fetch(`/fichas/${pericia_id}/pericia/remover/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": window.csrftoken
-        },
-        body: JSON.stringify({
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.mensagem) {
-            alert(data.mensagem);
-        }
-        if (!data.status) {
-            alert("Erro ao remover pericia! Tente novamente.");
-        }
-    })
-    .then(() => {
-        window.location.reload();
-    }); 
-}
-
-function salvarPericia(input, pericia_id) {
-   const valorAtual = input.value.trim();
-    const campo = input.dataset.save;
-    fetch(`/fichas/${pericia_id}/pericia/salvar/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": window.csrftoken
-        },
-        body: JSON.stringify({
-            campo: campo,   
-            valor: valorAtual
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.mensagem) {
-            alert(data.mensagem);
-        }
-        if (!data.status) {
-            alert("Erro ao salvar pericia! Tente novamente.");
-        }
-    }); 
-}
-
-/* Habilidades */
-
-function addHabilidade() {
-    fetch(`/fichas/${fichaId}/habilidade/criar/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": window.csrftoken
-        },
-        body: JSON.stringify({
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (!data.status) {
-            alert("Erro ao criar habilidade! Tente novamente.");
+            alert(`Erro ao criar ${tipo}! Tente novamente.`);
         }
     })
     .then(() => {
@@ -184,8 +113,8 @@ function addHabilidade() {
     });
 }
 
-function removerHabilidade(habilidade_id) {
-    fetch(`/fichas/${habilidade_id}/habilidade/remover/`, {
+function remover(tipo, id) {
+    fetch(`/fichas/${id}/${tipo}/remover/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -200,41 +129,13 @@ function removerHabilidade(habilidade_id) {
             alert(data.mensagem);
         }
         if (!data.status) {
-            alert("Erro ao remover habilidade! Tente novamente.");
+            alert(`Erro ao remover ${tipo}! Tente novamente.`);
         }
     })
     .then(() => {
         window.location.reload();
     }); 
 }
-
-function salvarHabilidade(input, habilidade_id) {
-    const valorAtual = input.value.trim();
-    const campo = input.dataset.save;
-    fetch(`/fichas/${habilidade_id}/habilidade/salvar/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": window.csrftoken
-        },
-        body: JSON.stringify({
-            campo: campo,   
-            valor: valorAtual
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.mensagem) {
-            alert(data.mensagem);
-        }
-        if (!data.status) {
-            alert("Erro ao salvar habilidade! Tente novamente.");
-        }
-    }); 
-}
-
-/* Inventário */
-
 
 function atualizarPatente() {
   const patente = document.getElementById("patenteSelect").value;
@@ -246,72 +147,5 @@ function atualizarPatente() {
   document.getElementById("limit-catIV").innerText = limite.catIV;
 };
 
-function addItem() {
-    fetch(`/fichas/${fichaId}/item/criar/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": window.csrftoken
-        },
-        body: JSON.stringify({
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (!data.status) {
-            alert("Erro ao criar item! Tente novamente.");
-        }
-    })
-    .then(() => {
-        window.location.reload();
-    });
-}
 
-function removerItem(item_id) {
-    fetch(`/fichas/${item_id}/item/remover/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": window.csrftoken
-        },
-        body: JSON.stringify({
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.mensagem) {
-            alert(data.mensagem);
-        }
-        if (!data.status) {
-            alert("Erro ao remover item! Tente novamente.");
-        }
-    })
-    .then(() => {
-        window.location.reload();
-    }); 
-}
 
-function salvarItem(input, item_id) {
-    const valorAtual = input.value.trim();
-    const campo = input.dataset.save;
-    fetch(`/fichas/${item_id}/item/salvar/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": window.csrftoken
-        },
-        body: JSON.stringify({
-            campo: campo,   
-            valor: valorAtual
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.mensagem) {
-            alert(data.mensagem);
-        }
-        if (!data.status) {
-            alert("Erro ao salvar item! Tente novamente.");
-        }
-    }); 
-}
