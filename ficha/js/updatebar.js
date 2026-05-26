@@ -13,7 +13,7 @@ function updateBar(type) {
   bar.style.width = percent + "%"; 
   } 
   
-  function loadStorage() { 
+function loadStorage() { 
     document.querySelectorAll("[data-save]").forEach(el => { 
       const key = el.dataset.save; 
       const value = localStorage.getItem(key); 

@@ -62,6 +62,31 @@ def salvar_ficha_view(request, ficha_id):
         return JsonResponse({"status": False, "mensagem": "Campo Invalido."})
     
 @login_required
+def salvar_foto_ficha_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    if request.method == 'POST' and request.FILES.get("foto_personagem"):
+        foto = request.FILES['foto_personagem']
+        if not foto.content_type.startswith("image/"):
+            return JsonResponse({"status": False, "mensagem": "Arquivo inválido."})
+        ficha.foto_personagem.save(foto.name, foto)
+        ficha.save()
+        return JsonResponse({"status": True})
+    return JsonResponse({"status": False, "mensagem": "Nenhuma foto enviada."})
+
+@login_required
+def salvar_token_ficha_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    if request.method == 'POST' and request.FILES.get('token_personagem'):
+        token = request.FILES['token_personagem']
+        if not token.content_type.startswith("image/"):
+            return JsonResponse({"status": False, "mensagem": "Arquivo inválido."})
+        ficha.token_personagem.save(token.name, token)
+        ficha.save()
+        return JsonResponse({"status": True})
+    return JsonResponse({"status": False, "mensagem": "Nenhum token enviado."})
+
+
+@login_required
 def detalhes_ficha_view(request, ficha_id):
     ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
     return render(request, 'fichas/detalhes.html', {'ficha': ficha})

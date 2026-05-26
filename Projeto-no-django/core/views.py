@@ -13,3 +13,4 @@ def home_view(request):
 def listar_usuarios_view(request):
     usuarios = User.objects.all()
     return render(request, 'core/listar.html', {'usuarios': usuarios})
+

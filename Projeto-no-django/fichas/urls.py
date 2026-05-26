@@ -12,6 +12,8 @@ urlpatterns = [
     path('<int:ficha_id>/ficha/', views.ler_ficha_view, name='ler_ficha'),
     path('<int:ficha_id>/ficha/excluir/', views.excluir_ficha_view, name='excluir_ficha'),
     path('<int:ficha_id>/ficha/salvar/', views.salvar_ficha_view, name='salvar_ficha'),
+    path('<int:ficha_id>/ficha/salvar/foto/', views.salvar_foto_ficha_view, name='salvar_foto_ficha'),
+    path('<int:ficha_id>/ficha/salvar/token/', views.salvar_token_ficha_view, name='salvar_token_ficha'),
 
     path('<int:ficha_id>/ataque/criar/', views.criar_ataque_view, name='criar_ataque'),
     path('<int:ataque_id>/ataque/salvar/', views.salvar_ataque_view, name='salvar_ataque'),
@@ -33,7 +35,6 @@ urlpatterns = [
     path('<int:ficha_id>/item/criar/', views.criar_item_view, name='criar_item'),
     path('<int:item_id>/item/salvar/', views.salvar_item_view, name='salvar_item'),
     path('<int:item_id>/item/remover/', views.remover_item_view, name='remover_item'),
-
 
     path('<int:ficha_id>/detalhes/', views.detalhes_ficha_view, name='detalhes_ficha'),
 ]

@@ -10,6 +10,8 @@ const patenteLimits = {
   Agente_de_Elite:     { catI: 3, catII: 3, catIII: 3, catIV: 2 }
 };
 
+const tipos = ["pericia", "habilidade", "item", "ataque"];
+
 window.atualizarPatente = atualizarPatente;
 
 const fichaId = document.querySelector(".sheet").dataset.id;
@@ -21,22 +23,35 @@ document.addEventListener("change", evento =>{
     if (alvo.classList.contains("naoficha")) {
         return;
     };
-    if (alvo.classList.contains("pericia")){
-        const periciaId = alvo.dataset.periciaId;
-        salvar("pericia", alvo, periciaId);
-    } else if (alvo.classList.contains("habilidade")){
-        const habilidadeId = alvo.dataset.habilidadeId;
-        salvar("habilidade", alvo, habilidadeId);
-    } else if (alvo.classList.contains("item")) {
-        const itemId = alvo.dataset.itemId;
-        salvar("item", alvo, itemId);
-    } else if (alvo.classList.contains("ataque")) {
-        const ataqueId = alvo.dataset.ataqueId;
-        salvar("ataque", alvo, ataqueId);
-    } else {
-        salvar("ficha", alvo, fichaId);
-    }
+
+    if (alvo.classList.contains("foto")) {
+        atualizarFoto(alvo, alvo.dataset.save);
+        return;
+    };
+
+    for (let tipo of tipos) {
+        if (alvo.classList.contains(tipo)) {
+            salvar(tipo, alvo, alvo.dataset[`${tipo}Id`]);
+            return;
+        }
+    };
+
+    salvar("ficha", alvo, fichaId);
 });
+
+const foto = document.getElementById("charImage"); 
+const inputFoto = document.getElementById("imageInput");
+foto.addEventListener("click", () => {
+    inputFoto.click();
+});
+
+if (document.getElementById("detailImage")) { /* se página for detalhes.html */
+    const token = document.getElementById("detailImage");
+    const inputToken = document.getElementById("detailImageInput");
+    token.addEventListener("click", () => {
+        inputToken.click();
+    });
+}
 
 if (document.getElementById("patenteSelect")) {     /* se página for inventario.html */
     document.addEventListener("DOMContentLoaded", function() {
@@ -44,7 +59,14 @@ if (document.getElementById("patenteSelect")) {     /* se página for inventario
     patenteSelect.value = patenteSelect.dataset.patente;
     atualizarPatente();
     });
-}
+};
+
+if (document.getElementById("pvAtual")) { /* se página for ficha.html / tiver barra de vida */
+    document.addEventListener("DOMContentLoaded", function() {
+        atualizarBarra("pv");
+        atualizarBarra("det");
+    });
+};
 
 /* Funções */
 
@@ -90,6 +112,9 @@ function salvar(tipo, input, id) {
             alert(`Erro ao salvar ${tipo}! Tente novamente.`);
         }
     });
+    if (["pvAtual", "pvMax", "detAtual", "detMax"].includes(input.id)) {
+    atualizarBarra(input.id.startsWith("pv") ? "pv" : "det");
+    }
 }
 
 function adicionar(tipo) {
@@ -147,5 +172,50 @@ function atualizarPatente() {
   document.getElementById("limit-catIV").innerText = limite.catIV;
 };
 
+
+function atualizarBarra(tipo) { 
+  const atual = Number(document.getElementById(tipo + "Atual").value); 
+  const maxima = Number(document.getElementById(tipo + "Max").value); 
+  const barra = document.getElementById(tipo + "Bar"); 
+
+  if (!maxima || maxima <= 0) { 
+    barra.style.width = "0%"; 
+    return; 
+  } 
+
+  const percentual = Math.max(0, Math.min(100, (atual / maxima) * 100)); 
+  barra.style.width = percentual + "%"; 
+};
+
+function atualizarFoto(input, campo) {
+    if (!input.files.length) {
+        return;
+    }
+    let url;
+    if (campo === "foto_personagem") {
+        url = `/fichas/${fichaId}/ficha/salvar/foto/`;
+    } else if (campo === "token_personagem") {
+        url = `/fichas/${fichaId}/ficha/salvar/token/`;
+    }
+    const arquivo = input.files[0];
+    const formData = new FormData();
+    formData.append(campo, arquivo);
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": window.csrftoken
+        },
+        body: formData
+    })
+    .then(resposta => resposta.json())
+    .then(data => {
+        if (!data.status) {
+            alert("Erro ao atualizar imagem! Tente novamente.");
+        }
+    })
+    .then(() => {
+        window.location.reload();
+    });
+};
 
 
