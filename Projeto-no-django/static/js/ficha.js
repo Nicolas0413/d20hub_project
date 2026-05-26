@@ -20,7 +20,7 @@ const fichaId = document.querySelector(".sheet").dataset.id;
 
 document.addEventListener("change", evento =>{
     const alvo = evento.target;
-    if (alvo.classList.contains("naoficha")) {
+    if (alvo.classList.contains("naoficha") || alvo.classList.contains("dados")) {
         return;
     };
 
@@ -218,4 +218,37 @@ function atualizarFoto(input, campo) {
     });
 };
 
-
+function rolarDados() {
+    let bonus = 0
+    const quantidade = parseInt(document.getElementById("diceQtd").value);
+    const lados = parseInt(document.getElementById("diceType").value);
+    bonus = parseInt(document.getElementById("diceBonus").value);
+    
+    fetch("/rolagens/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": window.csrftoken
+        },
+        body: JSON.stringify({
+            quantidade: quantidade,
+            lados: lados,
+            bonus: bonus
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.resultados) {
+            document.getElementById("dice-rolls").innerHTML = "Resultados: " + data.resultados.join(", ");
+        }
+        if (data.soma !== undefined) {
+            document.getElementById("dice-total").innerText = " Soma: " + data.soma;
+        }
+        if (data.maior !== undefined) {
+            document.getElementById("dice-max").innerText = " Maior: " + data.maior;
+        }
+        if (data.menor !== undefined) {
+            document.getElementById("dice-min").innerText = " Menor: " + data.menor;
+        }
+    });
+}

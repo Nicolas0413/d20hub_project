@@ -58,7 +58,6 @@
     <div class="attr" title="Vigor">VIG<input class="editable" value="{{ ficha.estatisticas.vigor }}" disabled type="number" data-save="estatisticas.vigor"></div>
   </div>
 
-
   <div class="section">
     <div class="label">VIDA</div>
     <div class="stat">
@@ -94,7 +93,6 @@
     </div>
   </div>
 
-
   <div class="section">
     <div>
       <table width="100%">
@@ -103,6 +101,7 @@
         <td class="listend" width="111.68">Crítico</td>
       </table>  
     </div>
+
     <div class="attacks" id="attacks">
 
       {% for ataque in ficha.ataques.all %} 
@@ -140,9 +139,9 @@
 
   <div class="dice-control">
 
-    <input id="diceQtd" class="naoficha" value="1" min="1" style="width:20px;">
+    <input id="diceQtd" class="dados" value="1" min="1" style="width:20px;" data-save="quantidade" title="Quantidade de dados a rolar">
 
-    <select class="dice naoficha" id="diceType" data-save="dice">
+    <select class="dice dados" id="diceType" data-save="lados">
       <option value="4">d4</option>
       <option value="6">d6</option>
       <option value="8" selected>d8</option>
@@ -153,17 +152,21 @@
     </select>
 
 
-    +<input id="diceBonus"  value="0" style="width:35px;" title="Bônus" class="naoficha">
+    +<input id="diceBonus" value="0" style="width:35px;" title="Bônus" class="dados">
 
 
-    <button class="dice"> <!-- onclick="rollFromInputs()" -->
+    <button class="dice" onclick="rolarDados()">
       <i class="bi bi-dice-6"></i> 
     </button>
 
   </div>
 
-  <div id="dice-result" class="dice-result"></div>
+  <div id="dice-result" class="dice-result">
+    <div id="dice-rolls"></div>
+    <div id="dice-max"></div>
+    <div id="dice-min"></div>
+    <div id="dice-total"></div>
   </div>
+  
 </body>
-
 </html>
