@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from .models import Estatisticas, Ficha, Pericia, Habilidade, Item, Ataque, Inventario
 from django.core.serializers.json import DjangoJSONEncoder
+import traceback
 
 # Dicts uteis
 
@@ -58,6 +59,14 @@ def checar_permissao(request, objeto):
     if hasattr(objeto, "inventario"):
         return objeto.inventario.ficha.usuario == request.user
     return False
+
+def limpar_ficha(ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id)       
+    Pericia.objects.filter(ficha=ficha).delete()
+    Habilidade.objects.filter(ficha=ficha).delete()
+    Ataque.objects.filter(ficha=ficha).delete()
+    Item.objects.filter(inventario__ficha=ficha).delete()
+    return True
 
 # Views
 
@@ -133,19 +142,6 @@ def salvar_view(request, categoria_id, categoria):
     return JsonResponse ({"status": status, "mensagem": mensagem})
 
 @login_required
-def excluir_view(request, categoria_id, categoria):
-    if request.method != 'POST':
-        return JsonResponse ({"status": False, "mensagem": "Método invalido"})
-    modelo = Modelos.get(categoria)
-    if not modelo:
-        return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
-    objeto = get_object_or_404(modelo, id=categoria_id)
-    if not checar_permissao(request, objeto):
-        return JsonResponse ({"status": False, "mensagem": "Permissão Negada"})
-    objeto.delete()
-    return JsonResponse({"status": True})
-
-@login_required
 def salvar_imagem_view(request, ficha_id, categoria):
     if request.method != 'POST':
         return JsonResponse ({"status": False, "mensagem": "Método invalido"})
@@ -160,30 +156,21 @@ def salvar_imagem_view(request, ficha_id, categoria):
     campo = getattr(ficha, categoria)
     campo.save(foto.name, foto)
     return JsonResponse({"status": True})
-    
-
-
 
 @login_required
-def importar_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    if request.method == 'POST' and request.FILES.get('ficha'):
-        arquivo = request.FILES['ficha']
-        try:
-            dados = json.load(arquivo)
-        except json.JSONDecodeError:
-            return JsonResponse({"status": False, "mensagem": "Arquivo JSON inválido."})
-        
-        dados_ficha = dados.get("dados_ficha", {})
-        estatisticas = dados.get("estatisticas", {})
-        pericias = dados.get("pericias", [])
-        habilidades = dados.get("habilidades", [])
-        ataques = dados.get("ataques", [])
-        inventario = dados.get("inventario", {})
-        itens = dados.get("itens", [])
+def excluir_view(request, categoria_id, categoria):
+    if request.method != 'POST':
+        return JsonResponse ({"status": False, "mensagem": "Método invalido"})
+    modelo = Modelos.get(categoria)
+    if not modelo:
+        return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
+    objeto = get_object_or_404(modelo, id=categoria_id)
+    if not checar_permissao(request, objeto):
+        return JsonResponse ({"status": False, "mensagem": "Permissão Negada"})
+    objeto.delete()
+    return JsonResponse({"status": True})
 
 
-        return JsonResponse({"status": True})
 
 @login_required
 def exportar_view(request, ficha_id):
@@ -196,7 +183,7 @@ def exportar_view(request, ficha_id):
     itens = Item.objects.filter(inventario=ficha.inventario)
     
     dados_ficha = {"nome": ficha.nome, "personagem": ficha.personagem, "nex": ficha.nex, "classe": ficha.classe, "trilha": ficha.trilha, "origem": ficha.origem, "patente": ficha.patente, "anotacoes": ficha.anotacoes, "aparencia": ficha.aparencia, "historia": ficha.historia}
-    estatisticas = {"força": status.forca, "agilidade": status.agilidade, "vigor": status.vigor, "intelecto": status.intelecto, "presença": status.presenca, "pv_atual": status.pv_atual, "pv_maximos": status.pv_maximos, "pe_atual": status.pe_atual, "pe_maximos": status.pe_maximos, "sanidade_atual": status.sanidade_atual, "sanidade_maxima": status.sanidade_maxima, "defesa": status.defesa, "esquiva": status.esquiva, "bloqueio": status.bloqueio}
+    estatisticas = {"forca": status.forca, "agilidade": status.agilidade, "vigor": status.vigor, "intelecto": status.intelecto, "presenca": status.presenca, "pv_atual": status.pv_atual, "pv_maximos": status.pv_maximos, "pe_atual": status.pe_atual, "pe_maximos": status.pe_maximos, "sanidade_atual": status.sanidade_atual, "sanidade_maxima": status.sanidade_maxima, "defesa": status.defesa, "esquiva": status.esquiva, "bloqueio": status.bloqueio}
     inventario = {"carga_atual": inventario.carga_atual, "carga_maxima": inventario.carga_maxima, "cat1": inventario.cat1, "cat2": inventario.cat2, "cat3": inventario.cat3, "cat4": inventario.cat4}
     pericias = list(pericias.values("nome", "descricao", "pagina", "dados", "treinamento", "bonus"))
     habilidades = list(habilidades.values("nome", "descricao", "pagina", "custo"))
@@ -210,14 +197,110 @@ def exportar_view(request, ficha_id):
 
     return arquivo
 
+
 @login_required
-def limpar_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    if request.method == 'POST':        
-        Pericia.objects.filter(ficha=ficha).delete()
-        Habilidade.objects.filter(ficha=ficha).delete()
-        Ataque.objects.filter(ficha=ficha).delete()
-        Item.objects.filter(inventario__ficha=ficha).delete()
-        return JsonResponse({"status": True})
-    
+def importar_view(request, ficha_id):
+    try:
+        if request.method != "POST":
+            return JsonResponse({"status": False, "mensagem": "Método inválido."})
+        ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+        arquivo = request.FILES.get("arquivo")
+        if not arquivo:
+            return JsonResponse({"status": False, "mensagem": "Nenhum arquivo enviado."})
+        try:
+            conteudo = arquivo.read()
+            if isinstance(conteudo, bytes):
+                conteudo = conteudo.decode("utf-8-sig")
+            dados = json.loads(conteudo)
+        except json.JSONDecodeError:
+            return JsonResponse({"status": False, "mensagem": "JSON inválido."})
+
+        if not isinstance(dados, dict):
+            return JsonResponse({"status": False, "mensagem": "Formato de JSON inválido."})
+
+        def campos_validos(modelo):
+            return {field.name for field in modelo._meta.concrete_fields if not field.primary_key}
+
+        def aplicar_dados(objeto, origem, excluir=()):
+            campos = campos_validos(objeto.__class__)
+            for campo, valor in origem.items():
+                if campo in campos and campo not in excluir:
+                    setattr(objeto, campo, valor)
+
+        dados_ficha = dados.get("dados_ficha", {})
+        if not isinstance(dados_ficha, dict):
+            return JsonResponse({"status": False, "mensagem": "Bloco 'dados_ficha' inválido."})
+
+        aplicar_dados(ficha, dados_ficha, excluir=("usuario",))
+        ficha.usuario = request.user
+        ficha.save()
+
+        dados_estatisticas = dados.get("estatisticas", {})
+        if not isinstance(dados_estatisticas, dict):
+            return JsonResponse({"status": False, "mensagem": "Bloco 'estatisticas' inválido."})
+
+        estatisticas, _ = Estatisticas.objects.get_or_create(ficha=ficha)
+        aplicar_dados(estatisticas, dados_estatisticas, excluir=("ficha",))
+        estatisticas.ficha = ficha
+        estatisticas.save()
+
+        dados_inventario = dados.get("inventario", {})
+        if not isinstance(dados_inventario, dict):
+            return JsonResponse({"status": False, "mensagem": "Bloco 'inventario' inválido."})
+
+        inventario, _ = Inventario.objects.get_or_create(ficha=ficha)
+        aplicar_dados(inventario, dados_inventario, excluir=("ficha",))
+        inventario.ficha = ficha
+        inventario.save()
+
+        listas = {
+            "pericias": (Pericia, "ficha"),
+            "habilidades": (Habilidade, "ficha"),
+            "ataques": (Ataque, "ficha"),
+            "itens": (Item, "inventario"),
+        }
+
+        contagens = {}
+
+        for chave_json, (modelo, relacao) in listas.items():
+            itens = dados.get(chave_json, [])
+            if itens is None:
+                itens = []
+
+            if not isinstance(itens, list):
+                return JsonResponse({"status": False, "mensagem": f"Bloco '{chave_json}' inválido."})
+
+            if relacao == "ficha":
+                modelo.objects.filter(ficha=ficha).delete()
+            elif relacao == "inventario":
+                modelo.objects.filter(inventario=inventario).delete()
+
+            novos = []
+
+            for entrada in itens:
+                if not isinstance(entrada, dict):
+                    return JsonResponse({"status": False, "mensagem": f"Item inválido dentro de '{chave_json}'."})
+
+                campos = {field.name for field in modelo._meta.concrete_fields if not field.primary_key}
+
+                entrada_filtrada = {campo: valor for campo, valor in entrada.items() if campo in campos and campo not in ("id", "ficha", "inventario")}
+
+                if relacao == "ficha":
+                    novos.append(modelo(ficha=ficha, **entrada_filtrada))
+                else:
+                    novos.append(modelo(inventario=inventario, **entrada_filtrada))
+
+            if novos:
+                modelo.objects.bulk_create(novos)
+
+            contagens[chave_json] = len(novos)
+
+        return JsonResponse({"status": True, "mensagem": "Ficha importada com sucesso.", "contagens": contagens})
+    except Exception as e:
+        print(traceback.format_exc())
+        return JsonResponse({"status": False, "mensagem": f"Erro ao importar ficha: {str(e)}"})
+
+
+
+
 

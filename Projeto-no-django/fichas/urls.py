@@ -14,9 +14,7 @@ urlpatterns = [
     path('<int:categoria_id>/<slug:categoria>/salvar/', views.salvar_view, name='salvar'),
     path('<int:ficha_id>/<str:categoria>/salvar/imagem/', views.salvar_imagem_view, name='salvar_imagem'),
     path('<int:categoria_id>/<slug:categoria>/excluir/', views.excluir_view, name='excluir'),
-    
 
-    path('<int:ficha_id>/ficha/limpar/', views.limpar_ficha_view, name='limpar_ficha'),
-    path('<int:ficha_id>/ficha/importar/', views.importar_view, name='importar_ficha'),
     path('<int:ficha_id>/ficha/exportar/', views.exportar_view, name='exportar_ficha'),
+    path('<int:ficha_id>/ficha/importar/', views.importar_view, name='importar_ficha'),
 ]

@@ -256,72 +256,32 @@ function exportFichaJSON() {
     window.location.href = `/fichas/${fichaId}/ficha/exportar/`
 };
 
-async function importarFichaJSON(evento) {
-    limparFicha(fichaId);
+function importarFichaJSON(evento) {
     const arquivo = evento.target.files[0];
     if (!arquivo) return;
-    try {
-        const texto = await arquivo.text();
-        const dados = JSON.parse(texto);
-
-        atualizarCampos(dados.dados_ficha);
-        atualizarCampos(dados.estatisticas, "estatisticas");
-        atualizarCampos(dados.inventario, "inventario");
-
-        if (Array.isArray(dados.pericias)) {
-            for (const pericia of dados.pericias) {
-                adicionar("pericia");
-                const elemento = document.querySelector( ".pericia:last-child");
-                if (!elemento) continue;
-                atualizarCampos(pericia, "", elemento);
-            }
-        }
-
-        for (const tipo of ["habilidade", "ataque", "item"]) {
-            if (Array.isArray(dados[tipo])) {
-                for (const item of dados[tipo]) {
-                    adicionar(tipo);
-                    const elemento = document.querySelector(`.${tipo}:last-child`);
-                    if (!elemento) continue;
-                    atualizarCampos(item, "", elemento);
-                }
-            }
-        }
-    } catch (erro) {
-        console.error(erro);
-        alert("Erro ao importar JSON.");
-    }
-}
-
-function atualizarCampo(seletor, valor, elemento=document) {
-    const input = elemento.querySelector(seletor);
-    if (!input) return;
-    input.value = valor;
-    input.dispatchEvent(new Event("change"));
-}
-
-function atualizarCampos(objeto, prefixo="", elemento=document) {
-    if (!objeto) return;
-    for (const [campo, valor] of Object.entries(objeto)) {
-        const seletor = prefixo ? `[data-save="${prefixo}.${campo}"]` : `[data-save="${campo}"]`;
-        atualizarCampo(seletor, valor, elemento);
-    }
-}
-
-function limparFicha(fichaId) {
-    fetch(`/fichas/${fichaId}/ficha/limpar/`, {
+    const formData = new FormData();
+    formData.append("arquivo", arquivo);
+    fetch(`/fichas/${fichaId}/ficha/importar/`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
             "X-CSRFToken": window.csrftoken
         },
-        body: JSON.stringify({})
+        body: formData
     })
     .then(res => res.json())
     .then(data => {
-        if (!data.status) {
-            alert("Erro ao limpar ficha! Tente novamente.");
+        if (data.mensagem) {
+            alert(data.mensagem);
         }
+        if (data.status) {
+            window.location.reload();
+        } else {
+            alert("Erro ao importar ficha! Tente novamente.");
+        }
+    })
+    .catch(err => {
+        console.error("Erro ao importar ficha:", err);
+        alert("Erro ao importar ficha! Tente novamente.");
     });
 }
 
