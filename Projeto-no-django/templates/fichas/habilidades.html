@@ -19,12 +19,12 @@
 <div class="sheet" data-id="{{ ficha.id }}">
   <header>
     <div style="margin-bottom: 10px; text-align: center;">
-      <a class="btn btn-outline-primary" href="{% url 'fichas:ler_ficha' ficha.id %}">Ficha</a>
-      <a class="btn btn-outline-primary" href="{% url 'fichas:pericias_ficha' ficha.id %}">Pericias</a>
-      <a class="btn btn-outline-primary" href="{% url 'fichas:habilidades_ficha' ficha.id %}">Habilidades</a>
-      <a class="btn btn-outline-primary" href="{% url 'fichas:inventario_ficha' ficha.id %}">Inventário</a>
-      <a class="btn btn-outline-primary" href="{% url 'fichas:detalhes_ficha' ficha.id %}">Detalhes</a>
-    </div>
+        <a class="btn btn-outline-primary" href="{% url 'fichas:ler' ficha.id 'ficha' %}">Ficha</a>
+        <a class="btn btn-outline-primary" href="{% url 'fichas:ler' ficha.id 'pericias' %}">Pericias</a>
+        <a class="btn btn-outline-primary" href="{% url 'fichas:ler' ficha.id 'habilidades' %}">Habilidades</a>
+        <a class="btn btn-outline-primary" href="{% url 'fichas:ler' ficha.id 'inventario' %}">Inventário</a>
+        <a class="btn btn-outline-primary" href="{% url 'fichas:ler' ficha.id 'detalhes' %}">Detalhes</a>
+      </div>
     <div class="top">
       <div class="image-wrapper">
         <img src="{{ ficha.foto_personagem.url }}" data-save="foto_personagem" class="photo" id="charImage" alt="Foto do personagem">

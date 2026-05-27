@@ -2,23 +2,75 @@ import json
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from .models import Estatisticas, Ficha, Pericia, TreinamentoFichaPericia, Habilidade, Item, Ataque, Inventario
+from .models import Estatisticas, Ficha, Pericia, Habilidade, Item, Ataque, Inventario
 from django.core.serializers.json import DjangoJSONEncoder
 
-MODELOS = {
+# Dicts uteis
+
+Modelos = {
     "ficha": Ficha,
     "habilidade": Habilidade,
     "ataque": Ataque,
     "pericia": Pericia,
-    "estatisticas": Estatisticas,
-    "inventario": Inventario,
     "item": Item
 }
+
+Paginas = {
+    "detalhes": "detalhes.html",
+    "ficha": "ficha.html",
+    "habilidades": "habilidades.html",
+    "home": "home.html",
+    "inventario": "inventario.html",
+    "pericias": "pericias.html"
+}
+
+Campos_Permitidos = {
+    "ficha": ["nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4"],
+    "ataque": ["nome", "dano", "critico"],
+    "pericia": ["nome", "descricao", "pagina", "dados", "bonus", "treinamento"],
+    "habilidade": ["nome", "descricao", "pagina", "custo"],
+    "item": ["nome", "categoria", "espaco", "descricao"],
+    "imagem": ["foto_personagem", "token_personagem"]
+}
+
+# Funções uteis 
+
+def salvar(request, campospermitidos, objeto):
+    dados = json.loads(request.body)
+    campo = dados.get('campo')
+    valor = dados.get('valor')
+    if campo not in campospermitidos:
+        return {"status": False, "mensagem": "Campo Invalido."}
+    if "." in campo: # Para campos relacionados" 
+        relacao, campo = campo.split(".")
+        if not hasattr(objeto, relacao): 
+            return {"status": False, "mensagem": "Relação inválida."}
+        objeto = getattr(objeto, relacao)
+    setattr(objeto, campo, valor)
+    objeto.save()
+    return {"status": True}
+
+def checar_permissao(request, objeto):
+    if hasattr(objeto, "usuario"):
+        return objeto.usuario == request.user
+    if hasattr(objeto, "ficha"):
+        return objeto.ficha.usuario == request.user
+    if hasattr(objeto, "inventario"):
+        return objeto.inventario.ficha.usuario == request.user
+    return False
+
+# Views
 
 @login_required
 def home_fichas_view(request):
     usuario = {'usuario': request.user.username}
     return render(request, 'fichas/home.html', usuario)
+
+@login_required
+def fichas_usuario_view(request):
+    fichas = Ficha.objects.filter(usuario=request.user)
+    vetor_fichas = [{"id": ficha.id, "nome": ficha.nome} for ficha in fichas]
+    return JsonResponse(vetor_fichas, safe=False, status=200)
 
 @login_required
 def criar_ficha_view(request):
@@ -33,267 +85,84 @@ def limpar_fichas_view(request):
     if request.method == 'POST':
         Ficha.objects.filter(usuario=request.user).delete()
         return JsonResponse({"status": True})
+    
+
+# CRUD Fichas
 
 @login_required
-def excluir_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id)
-    if request.method == 'POST':
-            ficha.delete()
-            return JsonResponse({"status": True})
+def criar_view(request, ficha_id, categoria):
+    if request.method != 'POST':
+        return JsonResponse ({"status": False, "mensagem": "Método invalido"})
+    modelo = Modelos.get(categoria)
+    if not modelo:
+        return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
+    
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    if categoria == "item":
+        modelo.objects.create(inventario=ficha.inventario)
+        return JsonResponse({"status": True}) 
+    modelo.objects.create(ficha=ficha)
+    return JsonResponse({"status": True})
+
+@login_required
+def ler_view(request, ficha_id, categoria):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    pagina = Paginas.get(categoria)
+    if not pagina:
+        return JsonResponse ({"status": False, "mensagem": "Não encontrada"}, status=404)
+    url = 'fichas/' + pagina
+    return render(request, url, {'ficha': ficha})
     
 @login_required
-def salvar_categoria_view(request, categoria_id, categoria):
+def salvar_view(request, categoria_id, categoria):
+    if request.method != 'POST':
+        return JsonResponse ({"status": False, "mensagem": "Método invalido"})
     mensagem = ""
-    modelo = MODELOS.get(categoria, "")
-    # nome = modelo.nome # Para teste inicial, remover dps
-    if modelo == "":
-        return
+    modelo = Modelos.get(categoria)
+    if not modelo:
+        return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
+    
     objeto = get_object_or_404(modelo, id=categoria_id)
-    if request.method == 'POST':
-        if categoria == "ficha":
-            if objeto.usuario == request.user:
-                campospermitidos = ["nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "pericias", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4"]
-                dados = salvar(request, campospermitidos, modelo, objeto)
-                status = dados["status"]
-                mensagem = dados.get("mensagem", "")
-        return JsonResponse ({"status": status, "mensagem": mensagem})
-
-def salvar(request, campospermitidos, objeto):
-    dados = json.loads(request.body)
-    campo = dados.get('campo')
-    valor = dados.get('valor')
-    if campo in campospermitidos:
-        if "." in campo: # Para campos relacionados" 
-            relacao, campo = campo.split(".")
-            if not hasattr(objeto, relacao): 
-                return {"status": False, "mensagem": "Relação inválida."}
-            objeto = getattr(objeto, relacao)
-        setattr(objeto, campo, valor)
-        objeto.save()
-        return {"status": True}
-    return {"status": False, "mensagem": "Campo Invalido."}
-
-
-@login_required
-def fichas_usuario_view(request):
-    fichas = Ficha.objects.filter(usuario=request.user)
-    vetor_fichas = [{"id": ficha.id, "nome": ficha.nome} for ficha in fichas]
-    return JsonResponse(vetor_fichas, safe=False, status=200)
-
-@login_required
-def ler_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    return render(request, 'fichas/ficha.html', {'ficha': ficha})
-
-@login_required
-def salvar_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    if request.method == 'POST':
-        campospermidos = ["nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "pericias", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4"]
-        dados = json.loads(request.body)
-        campo = dados.get('campo')
-        valor = dados.get('valor')
-        if campo in campospermidos:
-            if "." in campo: # Para campos relacionados" 
-                relacao, campo = campo.split(".")
-                objeto = getattr(ficha, relacao)
-                setattr(objeto, campo, valor)
-                objeto.save()
-                return JsonResponse({"status": True})
-            setattr(ficha, campo, valor)
-            ficha.save()
-            return JsonResponse({"status": True})
-        return JsonResponse({"status": False, "mensagem": "Campo Invalido."})
+    if not checar_permissao(request, objeto):
+        return JsonResponse ({"status": False, "mensagem": "Permissão Negada"})
     
+    campospermitidos = Campos_Permitidos.get(categoria, "")
+    dados = salvar(request, campospermitidos, objeto)
+    status = dados["status"]
+    mensagem = dados.get("mensagem", "")
+    return JsonResponse ({"status": status, "mensagem": mensagem})
+
 @login_required
-def salvar_foto_ficha_view(request, ficha_id):
+def excluir_view(request, categoria_id, categoria):
+    if request.method != 'POST':
+        return JsonResponse ({"status": False, "mensagem": "Método invalido"})
+    modelo = Modelos.get(categoria)
+    if not modelo:
+        return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
+    objeto = get_object_or_404(modelo, id=categoria_id)
+    if not checar_permissao(request, objeto):
+        return JsonResponse ({"status": False, "mensagem": "Permissão Negada"})
+    objeto.delete()
+    return JsonResponse({"status": True})
+
+@login_required
+def salvar_imagem_view(request, ficha_id, categoria):
+    if request.method != 'POST':
+        return JsonResponse ({"status": False, "mensagem": "Método invalido"})
     ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    if request.method == 'POST' and request.FILES.get("foto_personagem"):
-        foto = request.FILES['foto_personagem']
-        if not foto.content_type.startswith("image/"):
-            return JsonResponse({"status": False, "mensagem": "Arquivo inválido."})
-        ficha.foto_personagem.save(foto.name, foto)
-        ficha.save()
-        return JsonResponse({"status": True})
-    return JsonResponse({"status": False, "mensagem": "Nenhuma foto enviada."})
-
-@login_required
-def salvar_token_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    if request.method == 'POST' and request.FILES.get('token_personagem'):
-        token = request.FILES['token_personagem']
-        if not token.content_type.startswith("image/"):
-            return JsonResponse({"status": False, "mensagem": "Arquivo inválido."})
-        ficha.token_personagem.save(token.name, token)
-        ficha.save()
-        return JsonResponse({"status": True})
-    return JsonResponse({"status": False, "mensagem": "Nenhum token enviado."})
-
-
-@login_required
-def detalhes_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    return render(request, 'fichas/detalhes.html', {'ficha': ficha})
-    
-# Ataques CRUD
-
-# Já é lido no ler ficha
-
-@login_required
-def criar_ataque_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    if request.method == 'POST':
-        Ataque.objects.create(ficha=ficha)
-        return JsonResponse({"status": True})
-    
-@login_required
-def remover_ataque_view(request, ataque_id):
-    ataque = get_object_or_404(Ataque, id=ataque_id, ficha__usuario=request.user)
-    if request.method == 'POST':
-        ataque.delete()
-        return JsonResponse({"status": True})
-    
-@login_required
-def salvar_ataque_view(request, ataque_id):
-    ataque = get_object_or_404(Ataque, id=ataque_id, ficha__usuario=request.user)
-    campos_permitidos = ["nome", "dano", "critico"]
-    if request.method == 'POST':
-        dados = json.loads(request.body)
-        campo = dados.get('campo')
-        valor = dados.get('valor')
-        if campo not in campos_permitidos:
-            return JsonResponse({"status": False, "mensagem": "Campo invalido."})
-        setattr(ataque, campo, valor)
-        ataque.save()
-        return JsonResponse({"status": True})
-
-# Pericias CRUD
-
-@login_required
-def pericias_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    return render(request, 'fichas/pericias.html', {'ficha': ficha})
-
-@login_required
-def criar_pericia_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    if request.method == 'POST':
-        pericia = Pericia.objects.create()
-        TreinamentoFichaPericia.objects.create(ficha=ficha, pericia=pericia) 
-        return JsonResponse({"status": True})
-    
-@login_required
-def remover_pericia_view(request, pericia_id):
-    pericia = get_object_or_404(Pericia, id=pericia_id)
-    treinamento = get_object_or_404(TreinamentoFichaPericia, pericia=pericia, ficha__usuario=request.user)
-    if request.method == 'POST':
-        treinamento.delete()
-        pericia.delete()
-        return JsonResponse({"status": True})
-    
-@login_required
-def salvar_pericia_view(request, pericia_id):
-    pericia = get_object_or_404(Pericia, id=pericia_id)
-    treinamento = get_object_or_404(TreinamentoFichaPericia, pericia=pericia, ficha__usuario=request.user)
-    campos_permitidos = ["pericia.nome", "descricao", "pagina", "dados", "bonus", "treinamento"]
-    if request.method == 'POST':
-        dados = json.loads(request.body)
-        campo = dados.get('campo')
-        valor = dados.get('valor')
-        if campo not in campos_permitidos:
-            return JsonResponse({"status": False, "mensagem": "Campo invalido."})
-        if campo in ["dados", "bonus"]:
-            try:
-                int_valor = int(valor)
-                setattr(treinamento, campo, int_valor)
-            except ValueError:
-                return JsonResponse({"status": False, "mensagem": "Valor inválido para campo numérico."})
-            treinamento.save()
-            return JsonResponse({"status": True})
-        
-        if campo == "treinamento":
-            setattr(treinamento, campo, valor)
-            treinamento.save()
-            return JsonResponse({"status": True})
-
-        if "." in campo: # Para campo relacionado" 
-            campo = "nome"
-        setattr(pericia, campo, valor)
-        pericia.save()
-        return JsonResponse({"status": True})
+    if categoria not in Campos_Permitidos.get("imagem", []):
+        return JsonResponse({"status": False, "mensagem": "Categoria inválida."})
+    foto = request.FILES.get(categoria)
+    if not foto:
+        return JsonResponse({"status": False, "mensagem": "Nenhuma foto enviada."})
+    if not foto.content_type.startswith("image/"):
+        return JsonResponse({"status": False, "mensagem": "Arquivo inválido."})
+    campo = getattr(ficha, categoria)
+    campo.save(foto.name, foto)
+    return JsonResponse({"status": True})
     
 
-# Habilidades CRUD
 
-@login_required
-def habilidades_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    return render(request, 'fichas/habilidades.html', {'ficha': ficha})
-
-@login_required
-def criar_habilidade_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    if request.method == 'POST':
-        Habilidade.objects.create(ficha=ficha)
-        return JsonResponse({"status": True})
-    
-@login_required
-def remover_habilidade_view(request, habilidade_id):
-    habilidade = get_object_or_404(Habilidade, id=habilidade_id, ficha__usuario=request.user)
-    if request.method == 'POST':
-        habilidade.delete()
-        return JsonResponse({"status": True})
-    
-@login_required
-def salvar_habilidade_view(request, habilidade_id):
-    habilidade = get_object_or_404(Habilidade, id=habilidade_id, ficha__usuario=request.user)
-    campos_permitidos = ["nome", "descricao", "pagina", "custo"]
-    if request.method == 'POST':
-        dados = json.loads(request.body)
-        campo = dados.get('campo')
-        valor = dados.get('valor')
-        if campo not in campos_permitidos:
-            return JsonResponse({"status": False, "mensagem": "Campo invalido."})
-        setattr(habilidade, campo, valor)
-        habilidade.save()
-        return JsonResponse({"status": True})
-
-
-# Inventário CRUD
-
-@login_required
-def inventario_ficha_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    return render(request, 'fichas/inventario.html', {'ficha': ficha})
-
-@login_required
-def criar_item_view(request, ficha_id):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
-    if request.method == 'POST':
-        Item.objects.create(inventario=ficha.inventario)
-        return JsonResponse({"status": True})
-
-@login_required
-def remover_item_view(request, item_id):
-    item = get_object_or_404(Item, id=item_id, inventario__ficha__usuario=request.user)
-    if request.method == 'POST':
-        item.delete()
-        return JsonResponse({"status": True})
-
-@login_required
-def salvar_item_view(request, item_id):
-    item = get_object_or_404(Item, id=item_id, inventario__ficha__usuario=request.user)
-    campos_permitidos = ["nome", "categoria", "espaco", "descricao"]
-    if request.method == 'POST':
-        dados = json.loads(request.body)
-        campo = dados.get('campo')
-        valor = dados.get('valor')
-        if campo not in campos_permitidos:
-            return JsonResponse({"status": False, "mensagem": "Campo invalido."})
-        setattr(item, campo, valor)
-        item.save()
-        return JsonResponse({"status": True})
-    
 
 @login_required
 def importar_view(request, ficha_id):
@@ -321,7 +190,7 @@ def exportar_view(request, ficha_id):
     ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
     status = get_object_or_404(Estatisticas, ficha=ficha)
     inventario = get_object_or_404(Inventario, ficha=ficha)
-    pericias = TreinamentoFichaPericia.objects.filter(ficha=ficha)
+    pericias = Pericia.objects.filter(ficha=ficha)
     habilidades = Habilidade.objects.filter(ficha=ficha)
     ataques = Ataque.objects.filter(ficha=ficha)
     itens = Item.objects.filter(inventario=ficha.inventario)
@@ -329,7 +198,7 @@ def exportar_view(request, ficha_id):
     dados_ficha = {"nome": ficha.nome, "personagem": ficha.personagem, "nex": ficha.nex, "classe": ficha.classe, "trilha": ficha.trilha, "origem": ficha.origem, "patente": ficha.patente, "anotacoes": ficha.anotacoes, "aparencia": ficha.aparencia, "historia": ficha.historia}
     estatisticas = {"força": status.forca, "agilidade": status.agilidade, "vigor": status.vigor, "intelecto": status.intelecto, "presença": status.presenca, "pv_atual": status.pv_atual, "pv_maximos": status.pv_maximos, "pe_atual": status.pe_atual, "pe_maximos": status.pe_maximos, "sanidade_atual": status.sanidade_atual, "sanidade_maxima": status.sanidade_maxima, "defesa": status.defesa, "esquiva": status.esquiva, "bloqueio": status.bloqueio}
     inventario = {"carga_atual": inventario.carga_atual, "carga_maxima": inventario.carga_maxima, "cat1": inventario.cat1, "cat2": inventario.cat2, "cat3": inventario.cat3, "cat4": inventario.cat4}
-    pericias = list(pericias.values("pericia__nome", "pericia__descricao", "pericia__pagina", "dados", "treinamento", "bonus"))
+    pericias = list(pericias.values("nome", "descricao", "pagina", "dados", "treinamento", "bonus"))
     habilidades = list(habilidades.values("nome", "descricao", "pagina", "custo"))
     ataques = list(ataques.values("nome", "dano", "critico"))
     itens = list(itens.values("nome", "categoria", "espaco", "descricao"))
@@ -345,7 +214,7 @@ def exportar_view(request, ficha_id):
 def limpar_ficha_view(request, ficha_id):
     ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
     if request.method == 'POST':        
-        TreinamentoFichaPericia.objects.filter(ficha=ficha).delete()
+        Pericia.objects.filter(ficha=ficha).delete()
         Habilidade.objects.filter(ficha=ficha).delete()
         Ataque.objects.filter(ficha=ficha).delete()
         Item.objects.filter(inventario__ficha=ficha).delete()

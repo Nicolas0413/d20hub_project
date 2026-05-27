@@ -10,7 +10,6 @@ class Ficha(models.Model):
     classe = models.CharField(max_length=32, default="Combatente")
     trilha = models.CharField(max_length=32, default="Aniquilador")
     origem = models.CharField(max_length=32, default="Acadêmico")
-    pericias = models.ManyToManyField('Pericia', through='TreinamentoFichaPericia', blank=True)
     patente = models.CharField(max_length=32, default="Recruta")
     anotacoes = models.TextField(default="Anotações gerais sobre o personagem e missões")
     aparencia = models.TextField(default="Descrição física do personagem como: gênero, idade, altura etc.")
@@ -41,20 +40,17 @@ class Estatisticas(models.Model):
         return f"Estatísticas de {self.ficha.nome}"
 
 class Pericia(models.Model):
+    ficha = models.ForeignKey(Ficha, on_delete=models.CASCADE, related_name="pericias")
     nome = models.CharField(max_length=128, default="")
     descricao = models.TextField(default="")
     pagina = models.CharField(max_length=128, default="")
-
-    def __str__(self):
-        return self.nome
-
-class TreinamentoFichaPericia(models.Model):
-    ficha = models.ForeignKey(Ficha, on_delete=models.CASCADE, related_name="treinamentos_pericias")
-    pericia = models.ForeignKey(Pericia, on_delete=models.CASCADE, related_name="treinamentos_pericias")
     dados = models.IntegerField(null=True, blank=True, default=1)
     treinamento = models.CharField(max_length=32, default="")
     bonus = models.IntegerField(null=True, blank=True, default=0)
 
+    def __str__(self):
+        return self.nome
+    
 class Ataque(models.Model):
     ficha = models.ForeignKey(Ficha, on_delete=models.CASCADE, related_name="ataques")
     nome = models.CharField(max_length=32, default="Ataque")

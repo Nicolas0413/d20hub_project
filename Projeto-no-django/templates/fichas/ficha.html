@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
   <title>D20HUB</title>
   <link rel="stylesheet" href="{% static 'css/ficha.css' %}?v=1.1">
-  <script src="{% static 'js/ficha.js' %}?v=1.2" defer></script>
+  <script src="{% static 'js/ficha.js' %}?v=1.5" defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <script>
     window.csrftoken = '{{ csrf_token }}';
@@ -19,11 +19,11 @@
   <div class="sheet" data-id="{{ ficha.id }}">
     <header>
       <div style="margin-bottom: 10px; text-align: center;">
-        <a class="btn btn-outline-primary" href="{% url 'fichas:ler_ficha' ficha.id %}">Ficha</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:pericias_ficha' ficha.id %}">Pericias</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:habilidades_ficha' ficha.id %}">Habilidades</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:inventario_ficha' ficha.id %}">Inventário</a>
-        <a class="btn btn-outline-primary" href="{% url 'fichas:detalhes_ficha' ficha.id %}">Detalhes</a>
+        <a class="btn btn-outline-primary" href="{% url 'fichas:ler' ficha.id 'ficha' %}">Ficha</a>
+        <a class="btn btn-outline-primary" href="{% url 'fichas:ler' ficha.id 'pericias' %}">Pericias</a>
+        <a class="btn btn-outline-primary" href="{% url 'fichas:ler' ficha.id 'habilidades' %}">Habilidades</a>
+        <a class="btn btn-outline-primary" href="{% url 'fichas:ler' ficha.id 'inventario' %}">Inventário</a>
+        <a class="btn btn-outline-primary" href="{% url 'fichas:ler' ficha.id 'detalhes' %}">Detalhes</a>
       </div>
       <div class="top">
         <div class="image-wrapper">
