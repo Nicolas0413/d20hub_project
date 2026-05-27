@@ -1,8 +1,9 @@
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from .models import Estatisticas, Ficha, Pericia, TreinamentoFichaPericia, Habilidade, Item, Ataque, Inventario
+from django.core.serializers.json import DjangoJSONEncoder
 
 @login_required
 def home_fichas_view(request):
@@ -248,6 +249,63 @@ def salvar_item_view(request, item_id):
             return JsonResponse({"status": False, "mensagem": "Campo invalido."})
         setattr(item, campo, valor)
         item.save()
+        return JsonResponse({"status": True})
+    
+
+@login_required
+def importar_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    if request.method == 'POST' and request.FILES.get('ficha'):
+        arquivo = request.FILES['ficha']
+        try:
+            dados = json.load(arquivo)
+        except json.JSONDecodeError:
+            return JsonResponse({"status": False, "mensagem": "Arquivo JSON inválido."})
+        
+        dados_ficha = dados.get("dados_ficha", {})
+        estatisticas = dados.get("estatisticas", {})
+        pericias = dados.get("pericias", [])
+        habilidades = dados.get("habilidades", [])
+        ataques = dados.get("ataques", [])
+        inventario = dados.get("inventario", {})
+        itens = dados.get("itens", [])
+
+
+        return JsonResponse({"status": True})
+
+@login_required
+def exportar_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    status = get_object_or_404(Estatisticas, ficha=ficha)
+    inventario = get_object_or_404(Inventario, ficha=ficha)
+    pericias = TreinamentoFichaPericia.objects.filter(ficha=ficha)
+    habilidades = Habilidade.objects.filter(ficha=ficha)
+    ataques = Ataque.objects.filter(ficha=ficha)
+    itens = Item.objects.filter(inventario=ficha.inventario)
+    
+    dados_ficha = {"nome": ficha.nome, "personagem": ficha.personagem, "nex": ficha.nex, "classe": ficha.classe, "trilha": ficha.trilha, "origem": ficha.origem, "patente": ficha.patente, "anotacoes": ficha.anotacoes, "aparencia": ficha.aparencia, "historia": ficha.historia}
+    estatisticas = {"força": status.forca, "agilidade": status.agilidade, "vigor": status.vigor, "intelecto": status.intelecto, "presença": status.presenca, "pv_atual": status.pv_atual, "pv_maximos": status.pv_maximos, "pe_atual": status.pe_atual, "pe_maximos": status.pe_maximos, "sanidade_atual": status.sanidade_atual, "sanidade_maxima": status.sanidade_maxima, "defesa": status.defesa, "esquiva": status.esquiva, "bloqueio": status.bloqueio}
+    inventario = {"carga_atual": inventario.carga_atual, "carga_maxima": inventario.carga_maxima, "cat1": inventario.cat1, "cat2": inventario.cat2, "cat3": inventario.cat3, "cat4": inventario.cat4}
+    pericias = list(pericias.values("pericia__nome", "pericia__descricao", "pericia__pagina", "dados", "treinamento", "bonus"))
+    habilidades = list(habilidades.values("nome", "descricao", "pagina", "custo"))
+    ataques = list(ataques.values("nome", "dano", "critico"))
+    itens = list(itens.values("nome", "categoria", "espaco", "descricao"))
+
+    dados = {"dados_ficha": dados_ficha, "estatisticas": estatisticas, "pericias": pericias, "habilidades": habilidades,"ataques": ataques, "inventario": inventario, "itens": itens}
+
+    arquivo = HttpResponse(json.dumps(dados, indent=4, cls=DjangoJSONEncoder, ensure_ascii=False), content_type='application/json')
+    arquivo['Content-Disposition'] = ('attachment; filename="ficha.json"')
+
+    return arquivo
+
+@login_required
+def limpar_ficha_view(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    if request.method == 'POST':        
+        TreinamentoFichaPericia.objects.filter(ficha=ficha).delete()
+        Habilidade.objects.filter(ficha=ficha).delete()
+        Ataque.objects.filter(ficha=ficha).delete()
+        Item.objects.filter(inventario__ficha=ficha).delete()
         return JsonResponse({"status": True})
     
 

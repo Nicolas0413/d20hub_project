@@ -37,4 +37,8 @@ urlpatterns = [
     path('<int:item_id>/item/remover/', views.remover_item_view, name='remover_item'),
 
     path('<int:ficha_id>/detalhes/', views.detalhes_ficha_view, name='detalhes_ficha'),
+
+    path('<int:ficha_id>/ficha/limpar/', views.limpar_ficha_view, name='limpar_ficha'),
+    path('<int:ficha_id>/ficha/importar/', views.importar_view, name='importar_ficha'),
+    path('<int:ficha_id>/ficha/exportar/', views.exportar_view, name='exportar_ficha'),
 ]
