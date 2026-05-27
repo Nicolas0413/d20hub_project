@@ -142,7 +142,7 @@ function adicionar(tipo) {
 }
 
 function remover(tipo, id) {
-    fetch(`/fichas/${id}/${tipo}/remover/`, {
+    fetch(`/fichas/${id}/${tipo}/excluir/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -194,16 +194,10 @@ function atualizarFoto(input, campo) {
     if (!input.files.length) {
         return;
     }
-    let url;
-    if (campo === "foto_personagem") {
-        url = `/fichas/${fichaId}/ficha/salvar/foto/`;
-    } else if (campo === "token_personagem") {
-        url = `/fichas/${fichaId}/ficha/salvar/token/`;
-    }
     const arquivo = input.files[0];
     const formData = new FormData();
     formData.append(campo, arquivo);
-    fetch(url, {
+    fetch(`/fichas/${fichaId}/${campo}/salvar/imagem/`, {
         method: "POST",
         headers: {
             "X-CSRFToken": window.csrftoken
@@ -331,25 +325,5 @@ function limparFicha(fichaId) {
     });
 }
 
-function teste(categoria="ficha") {
-    fetch (`/fichas/${fichaId}/${categoria}/salvar/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": window.csrftoken
-        },
-        body: JSON.stringify({
-            campo: "nome",
-            valor: "gama"
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(data)
-        if (!data.status) {
-            alert("Erro ao limpar ficha! Tente novamente.");
-        }
-    });
-}
 
 
