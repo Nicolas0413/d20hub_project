@@ -331,4 +331,25 @@ function limparFicha(fichaId) {
     });
 }
 
+function teste(categoria="ficha") {
+    fetch (`/fichas/${fichaId}/${categoria}/salvar/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": window.csrftoken
+        },
+        body: JSON.stringify({
+            campo: "nome",
+            valor: "gama"
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data)
+        if (!data.status) {
+            alert("Erro ao limpar ficha! Tente novamente.");
+        }
+    });
+}
+
 

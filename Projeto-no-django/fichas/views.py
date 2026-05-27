@@ -5,6 +5,16 @@ from django.contrib.auth.decorators import login_required
 from .models import Estatisticas, Ficha, Pericia, TreinamentoFichaPericia, Habilidade, Item, Ataque, Inventario
 from django.core.serializers.json import DjangoJSONEncoder
 
+MODELOS = {
+    "ficha": Ficha,
+    "habilidade": Habilidade,
+    "ataque": Ataque,
+    "pericia": Pericia,
+    "estatisticas": Estatisticas,
+    "inventario": Inventario,
+    "item": Item
+}
+
 @login_required
 def home_fichas_view(request):
     usuario = {'usuario': request.user.username}
@@ -30,6 +40,39 @@ def excluir_ficha_view(request, ficha_id):
     if request.method == 'POST':
             ficha.delete()
             return JsonResponse({"status": True})
+    
+@login_required
+def salvar_categoria_view(request, categoria_id, categoria):
+    mensagem = ""
+    modelo = MODELOS.get(categoria, "")
+    # nome = modelo.nome # Para teste inicial, remover dps
+    if modelo == "":
+        return
+    objeto = get_object_or_404(modelo, id=categoria_id)
+    if request.method == 'POST':
+        if categoria == "ficha":
+            if objeto.usuario == request.user:
+                campospermitidos = ["nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "pericias", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4"]
+                dados = salvar(request, campospermitidos, modelo, objeto)
+                status = dados["status"]
+                mensagem = dados.get("mensagem", "")
+        return JsonResponse ({"status": status, "mensagem": mensagem})
+
+def salvar(request, campospermitidos, objeto):
+    dados = json.loads(request.body)
+    campo = dados.get('campo')
+    valor = dados.get('valor')
+    if campo in campospermitidos:
+        if "." in campo: # Para campos relacionados" 
+            relacao, campo = campo.split(".")
+            if not hasattr(objeto, relacao): 
+                return {"status": False, "mensagem": "Relação inválida."}
+            objeto = getattr(objeto, relacao)
+        setattr(objeto, campo, valor)
+        objeto.save()
+        return {"status": True}
+    return {"status": False, "mensagem": "Campo Invalido."}
+
 
 @login_required
 def fichas_usuario_view(request):

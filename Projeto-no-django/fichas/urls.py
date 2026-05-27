@@ -9,9 +9,11 @@ urlpatterns = [
     path('limpar/', views.limpar_fichas_view, name='limpar_fichas'),
     path('usuario/', views.fichas_usuario_view, name='fichas_usuario'),
 
+    path('<int:categoria_id>/<slug:categoria>/salvar/', views.salvar_categoria_view, name='salvar'),
+
     path('<int:ficha_id>/ficha/', views.ler_ficha_view, name='ler_ficha'),
     path('<int:ficha_id>/ficha/excluir/', views.excluir_ficha_view, name='excluir_ficha'),
-    path('<int:ficha_id>/ficha/salvar/', views.salvar_ficha_view, name='salvar_ficha'),
+    # path('<int:ficha_id>/ficha/salvar/', views.salvar_ficha_view, name='salvar_ficha'),
     path('<int:ficha_id>/ficha/salvar/foto/', views.salvar_foto_ficha_view, name='salvar_foto_ficha'),
     path('<int:ficha_id>/ficha/salvar/token/', views.salvar_token_ficha_view, name='salvar_token_ficha'),
 
