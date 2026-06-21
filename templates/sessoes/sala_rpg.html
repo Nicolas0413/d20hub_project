@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{% static 'js/sala_rpg.js' %}?v=9999" defer></script>
+    <title>Sala</title>
+</head>
+<body>
+    <h1>Mesa de RPG</h1>
+    <input type="hidden" id="codigo-sala" value="{{ sala.codigo }}">
+    <form id="form">
+        <input type="text" name="mensagem">
+    </form>
+    <div id="mensagens"></div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar em uma Sala</title>
+</head>
+<body>
+    <h2>Entrar em uma Sala</h2>
+
+    {% if messages %}
+        <div>
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'sessoes:entrar_sala' %}">
+        {% csrf_token %}
+        <label for="id_codigo">Código da Sala:</label>
+        
+        <input 
+            id="id_codigo" 
+            name="codigo" 
+            placeholder="Ex: A8F3K" 
+            required 
+            maxlength="6"
+            autocomplete="off"
+            oninput="this.value = this.value.toUpperCase()"
+        >
+        
+        <button type="submit">Entrar na Mesa</button>
+    </form>
+</body>
+</html>
