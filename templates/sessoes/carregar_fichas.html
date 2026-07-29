@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <!--bootstrap css-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <!--bootstrap icons-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <!--bootstrap javascript-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/sala_rpg.css' %}">
     <script src="{% static 'js/sala_rpg.js' %}?v=9999.11" defer></script>
 </head>
@@ -17,7 +17,7 @@
     <div class="accordion accordion-custom" id="accordionExample">
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#ficha{{ ficha.id }}" aria-expanded="false" aria-controls="ficha{{ ficha.id }}">
                     <div class="item-row" style="width:100%">
                         <p>Ficha: {{ ficha.nome }}</p>
                         <p>Usuário: {{ ficha.usuario }}</p>
@@ -25,7 +25,7 @@
                     </div>
                 </button>
             </h2>
-            <div id="ficha{{ ficha.id }}" class="accordion-collapse collapse">
+            <div id="ficha{{ ficha.id }}" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                 <div class="accordion-body">
                     <p>Link para a ficha: <a href="{% url 'fichas:ler' ficha_id=ficha.id categoria='ficha' %}">{{ ficha.nome }}</a></p>
                     <button class="remove-item" data-item-id="{{ ficha.id }}">

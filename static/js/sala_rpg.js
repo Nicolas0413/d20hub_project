@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (data.type === 'system') {
             console.log(data.message);
         } else if (data.type === 'carregar_ficha') {
-
+            carregarFicha(data.ficha_id);
         }
     };
 

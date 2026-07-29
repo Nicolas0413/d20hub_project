@@ -42,14 +42,31 @@ class SalaConsumer(WebsocketConsumer):
         if not mensagem:
             return
 
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'nome': self.scope['user'].username,
-                'mensagem': mensagem,
-            }
-        )
+        if mensagem.startswith('/carregar_ficha'):
+            ficha_id = mensagem.split(' ')[1] if len(mensagem.split(' ')) > 1 else None
+            if ficha_id:
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'carregar_ficha',
+                        'mensagem': f'Carregando ficha {ficha_id}...',
+                        'ficha': ficha_id,
+                    }
+                )
+            else:
+                self.send(text_data=json.dumps({
+                    'type': 'system',
+                    'message': 'Uso correto: /carregar_ficha <id_da_ficha>'
+                }))
+        else:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'nome': self.scope['user'].username,
+                    'mensagem': mensagem,
+                }
+            )
 
     def chat_message(self, event):
         self.send(text_data=json.dumps({
