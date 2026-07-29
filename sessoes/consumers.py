@@ -2,7 +2,7 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from django.template.loader import render_to_string
-
+from fichas.models import Ficha
 
 class SalaConsumer(WebsocketConsumer):
     def connect(self):
@@ -75,13 +75,8 @@ class SalaConsumer(WebsocketConsumer):
             'mensagem': event['mensagem'],
         }))
 
-    async def carregar_ficha(self, event):
-        contexto = {'ficha': event['ficha']};
-
-        html_accordion = render_to_string('sessoes/carregar_fichas.html', contexto)
-
-        await self.send(text_data=json.dumps({
+    def carregar_ficha(self, event):
+        self.send(text_data=json.dumps({
             'type': 'carregar_ficha',
-            'action': 'render_accordion',
-            'html': html_accordion
+            'ficha_id': event.get('ficha')
         }))

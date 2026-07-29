@@ -115,7 +115,7 @@ def criar_view(request, ficha_id, categoria):
 
 @login_required
 def ler_view(request, ficha_id, categoria):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    ficha = get_object_or_404(Ficha, id=ficha_id)
     pagina = Paginas.get(categoria)
     if not pagina:
         return JsonResponse ({"status": False, "mensagem": "Não encontrada"}, status=404)

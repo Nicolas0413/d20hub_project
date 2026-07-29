@@ -1,3 +1,5 @@
+let socket;
+
 function adicionarFicha() {
     fetch(typeof selecionarFichaUrl !== 'undefined' ? selecionarFichaUrl : '/sessoes/selecionar-ficha/')
         .then(response => response.text())
@@ -16,7 +18,9 @@ function adicionarFicha() {
             fichaButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const fichaId = button.getAttribute('data-ficha-id');
-                    carregarFicha(fichaId);
+                    if (socket.readyState === WebSocket.OPEN) {
+                        socket.send(JSON.stringify({ mensagem: `/carregar_ficha ${fichaId}` }));
+                    };
                     document.body.removeChild(modal);
                 });
             });
@@ -55,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const protocolo = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const codigoSala = document.getElementById('codigo-sala').value;
     const url = `${protocolo}://${window.location.host}/ws/sala/${codigoSala}/`;
-    const socket = new WebSocket(url);
+    socket = new WebSocket(url);
     const form = document.getElementById('form');
     const mensagens = document.getElementById('mensagens');
 
