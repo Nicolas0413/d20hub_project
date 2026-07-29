@@ -1,28 +1,58 @@
 import json
 from channels.generic.websocket import WebsocketConsumer
+from asgiref.sync import async_to_sync
+
 
 class SalaConsumer(WebsocketConsumer):
     def connect(self):
         try:
             self.codigo_sala = self.scope['url_route']['kwargs']['codigo_sala']
-            print(f"--- Código da sala capturado: {self.codigo_sala} ---")
+            self.room_group_name = f"sala_{self.codigo_sala}"
+
             self.accept()
+
+            async_to_sync(self.channel_layer.group_add)(
+                self.room_group_name,
+                self.channel_name,
+            )
+
             self.send(text_data=json.dumps({
-                'message': 'Conexão estabelecida com sucesso!'
+                'type': 'system',
+                'message': f'Conectado à sala {self.codigo_sala}.'
             }))
         except Exception as e:
-            print(f"--- ERRO NA CONEXÃO: {e} ---")
+            self.send(text_data=json.dumps({
+                'type': 'system',
+                'message': f'Erro na conexão: {e}'
+            }))
             self.close()
 
     def disconnect(self, close_code):
-        print("--- CONEXÃO ENCERRADA ---")
+        if hasattr(self, 'room_group_name'):
+            async_to_sync(self.channel_layer.group_discard)(
+                self.room_group_name,
+                self.channel_name,
+            )
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        mensagem = text_data_json.get('mensagem')
+        mensagem = (text_data_json.get('mensagem') or '').strip()
 
-        print(f"--- Mensagem recebida: {mensagem} ---")
+        if not mensagem:
+            return
+
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'nome': self.scope['user'].username,
+                'mensagem': mensagem,
+            }
+        )
+
+    def chat_message(self, event):
         self.send(text_data=json.dumps({
             'type': 'chat_message',
-            'mensagem': mensagem
+            'nome': event['nome'],
+            'mensagem': event['mensagem'],
         }))

@@ -5,15 +5,26 @@
     <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="{% static 'js/sala_rpg.js' %}?v=9999" defer></script>
+    <script src="{% static 'js/sala_rpg.js' %}?v=9999.6" defer></script>
     <title>Sala</title>
 </head>
 <body>
+    <a href="{% url 'sessoes:entrar_sala' %}">Voltar</a>
     <h1>Mesa de RPG</h1>
     <input type="hidden" id="codigo-sala" value="{{ sala.codigo }}">
     <form id="form">
-        <input type="text" name="mensagem">
+        <input type="text" name="mensagem" id="mensagem" placeholder="Digite sua mensagem...">
+        <input type="submit" value="Enviar">
     </form>
     <div id="mensagens"></div>
+    <div id="fichas">
+        {% for ficha in minhas_fichas %}
+            <div class="ficha">
+                <h3>{{ ficha.nome }}</h3>
+                <p>Classe: {{ ficha.classe }}</p>
+                <p>Nex: {{ ficha.nex }}</p>
+            </div>
+        {% endfor %}
+    </div>
 </body>
 </html>

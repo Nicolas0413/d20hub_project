@@ -11,14 +11,15 @@ def criar_sala(request):
 
 @login_required
 def entrar_sala(request):
-    if request.method == "POST":
-        codigo = request.POST.get("codigo").strip().upper()
-        
-        if Sala.objects.filter(codigo=codigo).exists():
-            return redirect('sessoes:sala_rpg', codigo_sala=codigo)
-        else:
-            messages.error(request, "Código de sala inválido ou inexistente!")
-            
+    if request.method != "POST":
+        return render(request, 'sessoes/entrar_sala.html')
+
+    codigo = request.POST.get("codigo", "").strip().upper()
+
+    if Sala.objects.filter(codigo=codigo).exists():
+        return redirect('sessoes:sala_rpg', codigo_sala=codigo)
+
+    messages.error(request, "Código de sala inválido ou inexistente!")
     return render(request, 'sessoes/entrar_sala.html')
 
 @login_required
