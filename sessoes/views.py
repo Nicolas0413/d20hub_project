@@ -31,3 +31,11 @@ def sala_rpg(request, codigo_sala):
         'sala': sala,
         'minhas_fichas': minhas_fichas
     })
+
+@login_required
+def selecionar_ficha(request):
+    minhas_fichas = Ficha.objects.filter(usuario=request.user)
+    fichas = [(ficha.id, ficha.nome) for ficha in minhas_fichas]
+    return render(request, 'sessoes/selecionar_ficha.html', {
+        'fichas': fichas
+    })

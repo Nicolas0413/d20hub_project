@@ -7,4 +7,5 @@ urlpatterns = [
     path('criar/', views.criar_sala, name='criar_sala'),
     path('entrar/', views.entrar_sala, name='entrar_sala'),
     path('sala/<str:codigo_sala>/', views.sala_rpg, name='sala_rpg'),
+    path('selecionar_ficha/', views.selecionar_ficha, name='selecionar_ficha'),
 ]

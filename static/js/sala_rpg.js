@@ -1,3 +1,45 @@
+function adicionarFicha() {
+    fetch(typeof selecionarFichaUrl !== 'undefined' ? selecionarFichaUrl : '/sessoes/selecionar-ficha/')
+        .then(response => response.text())
+        .then(html => {
+            const modal = document.createElement('div');
+            modal.classList.add('modal-wrapper');
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+
+            const closeModalBtn = modal.querySelector('.close-modal');
+            closeModalBtn.addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+
+            const fichaButtons = modal.querySelectorAll('.carregar-ficha');
+            fichaButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const fichaId = button.getAttribute('data-ficha-id');
+                    carregarFicha(fichaId);
+                    document.body.removeChild(modal);
+                });
+            });
+
+            // Fechar modal ao clicar fora
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar modal:', error);
+            alert('Erro ao carregar fichas. Tente novamente.');
+        });
+}
+
+function carregarFicha(fichaId) {
+    console.log('Carregando ficha:', fichaId);
+    // Aqui você pode adicionar a lógica para carregar a ficha
+    // Por exemplo, fazer um fetch para preencher os dados da ficha
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const protocolo = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const codigoSala = document.getElementById('codigo-sala').value;
