@@ -36,8 +36,19 @@ function adicionarFicha() {
 
 function carregarFicha(fichaId) {
     console.log('Carregando ficha:', fichaId);
-    // Aqui você pode adicionar a lógica para carregar a ficha
-    // Por exemplo, fazer um fetch para preencher os dados da ficha
+    const divmae = document.getElementById('fichas');
+    const div = document.createElement('div');
+    div.id = `ficha-${fichaId}`;
+    divmae.appendChild(div);
+    fetch(`/sessoes/carregar_ficha/${fichaId}/`)
+        .then(response => response.text())
+        .then(html => {
+            div.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Erro ao carregar ficha:', error);
+            div.innerHTML = `<p>Erro ao carregar ficha ${fichaId}.</p>`;
+        });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -82,6 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
             adicionarMensagem(`${data.nome}: ${data.mensagem}`);
         } else if (data.type === 'system') {
             console.log(data.message);
+        } else if (data.type === 'carregar_ficha') {
+
         }
     };
 
@@ -94,4 +107,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error(e);
         adicionarMensagem('Ocorreu um erro na conexão com a sala.');
     };
-});
+})

@@ -39,3 +39,8 @@ def selecionar_ficha(request):
     return render(request, 'sessoes/selecionar_ficha.html', {
         'fichas': fichas
     })
+
+@login_required
+def carregar_ficha(request, ficha_id):
+    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    return render(request, 'sessoes/carregar_fichas.html', {'ficha': ficha})
