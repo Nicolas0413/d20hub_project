@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{% static 'css/sala_rpg.css' %}">
     <script>
         const selecionarFichaUrl = "{% url 'sessoes:selecionar_ficha' %}";
+        window.csrftoken = '{{ csrf_token }}';
     </script>
     <script src="{% static 'js/sala_rpg.js' %}?v=9999.12" defer></script>
     <title>Sala</title>

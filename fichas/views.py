@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from .models import Estatisticas, Ficha, Pericia, Habilidade, Item, Ataque, Inventario
 from django.core.serializers.json import DjangoJSONEncoder
 import traceback
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 # Dicts uteis
 
@@ -26,7 +28,7 @@ Paginas = {
 }
 
 Campos_Permitidos = {
-    "ficha": ["nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4"],
+    "ficha": ["visibilidade", "editabilidade", "nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4"],
     "ataque": ["nome", "dano", "critico"],
     "pericia": ["nome", "descricao", "pagina", "dados", "bonus", "treinamento"],
     "habilidade": ["nome", "descricao", "pagina", "custo"],

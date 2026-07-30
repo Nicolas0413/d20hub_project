@@ -21,7 +21,23 @@
                     <div class="item-row" style="width:100%">
                         <p>Ficha: {{ ficha.nome }}</p>
                         <p>Usuário: {{ ficha.usuario }}</p>
-                        <p>Visibilidade: {{ ficha.visibilidade }}</p>
+                        {% if request.user == ficha.usuario %}
+                            <p>Visibilidade: 
+                                <form method="post" class="d-inline-block">
+                                    {% csrf_token %}
+                                    <select data-id="{{ ficha.id }}" class="form-select form-select-sm d-inline-block w-auto" 
+                                            onclick="event.stopPropagation()" 
+                                            onchange="alterarVisibilidade(this.dataset.id, this.value)">
+                                        <option value="3" {% if ficha.visibilidade == 3 %}selected{% endif %}>Pública</option>
+                                        <option value="2" {% if ficha.visibilidade == 2 %}selected{% endif %}>Sala</option>
+                                        <option value="1" {% if ficha.visibilidade == 1 %}selected{% endif %}>Mestre</option>
+                                        <option value="0" {% if ficha.visibilidade == 0 %}selected{% endif %}>Privada</option>
+                                    </select>
+                                </form>
+                            </p>
+                        {% else %}
+                            <p>Visibilidade: {{ ficha.visibilidade }}</p>
+                        {% endif %}
                     </div>
                 </button>
             </h2>

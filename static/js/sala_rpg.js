@@ -38,6 +38,29 @@ function adicionarFicha() {
         });
 }
 
+function alterarVisibilidade(fichaId, visibilidade) {
+    fetch(`/fichas/${fichaId}/ficha/salvar/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": window.csrftoken
+        },
+        body: JSON.stringify({
+            campo: 'visibilidade',   
+            valor: visibilidade
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.mensagem) {
+            alert(data.mensagem);
+        }
+        if (!data.status) {
+            alert(`Erro ao salvar ${tipo}! Tente novamente.`);
+        }
+    });
+}
+
 function carregarFicha(fichaId) {
     console.log('Carregando ficha:', fichaId);
     const divmae = document.getElementById('fichas');
