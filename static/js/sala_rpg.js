@@ -102,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({ mensagem }));
+            mensagem.value = '';
         } else {
             adicionarMensagem('A conexão ainda não está pronta. Tente novamente.');
         }
