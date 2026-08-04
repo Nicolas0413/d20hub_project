@@ -10,6 +10,7 @@ def gerar_codigo_unico():
 class Sala(models.Model):
     codigo = models.CharField(max_length=6, unique=True, default=gerar_codigo_unico)
     mestre = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="salas_mestrando")
+    jogadores = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="salas_participando", blank=True)
 
     def __str__(self):
         return f"({self.codigo})"
