@@ -1,7 +1,9 @@
 import json
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.contrib.auth.decorators import login_required
+
+from sessoes.models import FichaSessao, Sala
 from .models import Estatisticas, Ficha, Pericia, Habilidade, Item, Ataque, Inventario
 from django.core.serializers.json import DjangoJSONEncoder
 import traceback
@@ -53,13 +55,56 @@ def salvar(request, campospermitidos, objeto):
     objeto.save()
     return {"status": True}
 
-def checar_permissao(request, objeto):
+def lista_autorizados(objeto, permissao):
+    if permissao == "visibilidade":
+        visibilidade = getattr(objeto, "visibilidade")
+        match visibilidade:
+            case 0:
+                return [objeto.usuario.id]
+            case 1:
+                sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
+                salas = [sessao.sala for sessao in sessoes]
+                mestres = [sala.mestre.id for sala in salas]
+                return mestres
+            case 2:
+                sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
+                salas = [sessao.sala for sessao in sessoes]
+                jogadores = [jogador.id for sala in salas for jogador in sala.jogadores.all()]
+                return jogadores
+            case 3:
+                return "publica"
+    elif permissao == "editabilidade":
+        editabilidade = getattr(objeto, "editabilidade")
+        match editabilidade:
+            case 0:
+                return [objeto.usuario.id]
+            case 1:
+                sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
+                salas = [sessao.sala for sessao in sessoes]
+                mestres = [sala.mestre.id for sala in salas]
+                return mestres
+            case 2:
+                sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
+                salas = [sessao.sala for sessao in sessoes]
+                jogadores = [jogador.id for sala in salas for jogador in sala.jogadores.all()]
+                return jogadores
+            case 3:
+                return "publica"
+
+def checar_permissao(objeto, permissao):
+    usuarios_permitidos = lista_autorizados(objeto, permissao)
     if hasattr(objeto, "usuario"):
-        return objeto.usuario == request.user
+        if objeto.usuario in usuarios_permitidos:
+            return True
+        return False
     if hasattr(objeto, "ficha"):
-        return objeto.ficha.usuario == request.user
+        if objeto.ficha.usuario in usuarios_permitidos:
+            return True
+        return False
     if hasattr(objeto, "inventario"):
-        return objeto.inventario.ficha.usuario == request.user
+        if objeto.inventario.ficha.usuario in usuarios_permitidos:
+            return True
+        return False
     return False
 
 def limpar_ficha(ficha_id):
@@ -122,6 +167,8 @@ def ler_view(request, ficha_id, categoria):
     if not pagina:
         return JsonResponse ({"status": False, "mensagem": "Não encontrada"}, status=404)
     url = 'fichas/' + pagina
+    if not checar_permissao(ficha, "visualizacao"):
+        return JsonResponse ({"status": False, "mensagem": "Não tem permissão de acesso"}, status=403)
     return render(request, url, {'ficha': ficha})
     
 @login_required
@@ -134,7 +181,7 @@ def salvar_view(request, categoria_id, categoria):
         return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
     
     objeto = get_object_or_404(modelo, id=categoria_id)
-    if not checar_permissao(request, objeto):
+    if not checar_permissao(objeto, "editabilidade"):
         return JsonResponse ({"status": False, "mensagem": "Permissão Negada"})
     
     campospermitidos = Campos_Permitidos.get(categoria, "")
@@ -167,12 +214,10 @@ def excluir_view(request, categoria_id, categoria):
     if not modelo:
         return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
     objeto = get_object_or_404(modelo, id=categoria_id)
-    if not checar_permissao(request, objeto):
+    if not checar_permissao(objeto, "editabilidade"):
         return JsonResponse ({"status": False, "mensagem": "Permissão Negada"})
     objeto.delete()
     return JsonResponse({"status": True})
-
-
 
 @login_required
 def exportar_view(request, ficha_id):

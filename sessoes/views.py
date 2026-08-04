@@ -17,6 +17,8 @@ def entrar_sala(request):
     codigo = request.POST.get("codigo", "").strip().upper()
 
     if Sala.objects.filter(codigo=codigo).exists():
+        sala = Sala.objects.get(codigo=codigo)
+        sala.jogadores.add(request.user)
         return redirect('sessoes:sala_rpg', codigo_sala=codigo)
 
     messages.error(request, "Código de sala inválido ou inexistente!")
