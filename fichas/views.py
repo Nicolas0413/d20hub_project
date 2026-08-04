@@ -82,19 +82,7 @@ def checar_permissao(request, objeto, permissao):
     print("Permitidos:", usuarios_permitidos)
     if usuarios_permitidos == "publica":
         return True
-    if hasattr(objeto, "usuario"):
-        if request.user.id in usuarios_permitidos:
-            return True
-        return False
-    if hasattr(objeto, "ficha"):
-        if request.user.id in usuarios_permitidos:
-            return True
-        return False
-    if hasattr(objeto, "inventario"):
-        if request.user.id in usuarios_permitidos:
-            return True
-        return False
-    return False
+    return request.user.id in usuarios_permitidos
 
 def limpar_ficha(ficha_id):
     ficha = get_object_or_404(Ficha, id=ficha_id)       
