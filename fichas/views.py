@@ -78,8 +78,6 @@ def lista_autorizados(objeto, permissao):
 
 def checar_permissao(request, objeto, permissao):
     usuarios_permitidos = lista_autorizados(objeto, permissao)
-    print("Usuário logado:", request.user.id)
-    print("Permitidos:", usuarios_permitidos)
     if usuarios_permitidos == "publica":
         return True
     return request.user.id in usuarios_permitidos
