@@ -56,43 +56,30 @@ def salvar(request, campospermitidos, objeto):
     return {"status": True}
 
 def lista_autorizados(objeto, permissao):
-    if permissao == "visibilidade":
-        visibilidade = getattr(objeto, "visibilidade")
-        match visibilidade:
-            case 0:
-                return [objeto.usuario.id]
-            case 1:
-                sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
-                salas = [sessao.sala for sessao in sessoes]
-                mestres = [sala.mestre.id for sala in salas]
-                return mestres
-            case 2:
-                sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
-                salas = [sessao.sala for sessao in sessoes]
-                jogadores = [jogador.id for sala in salas for jogador in sala.jogadores.all()]
-                return jogadores
-            case 3:
-                return "publica"
-    elif permissao == "editabilidade":
-        editabilidade = getattr(objeto, "editabilidade")
-        match editabilidade:
-            case 0:
-                return [objeto.usuario.id]
-            case 1:
-                sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
-                salas = [sessao.sala for sessao in sessoes]
-                mestres = [sala.mestre.id for sala in salas]
-                return mestres
-            case 2:
-                sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
-                salas = [sessao.sala for sessao in sessoes]
-                jogadores = [jogador.id for sala in salas for jogador in sala.jogadores.all()]
-                return jogadores
-            case 3:
-                return "publica"
+    if permissao not in ["visibilidade", "editabilidade"]:
+        return 
+    valor_permissao = getattr(objeto, permissao)
+    match valor_permissao:
+        case 0:
+            return [objeto.usuario.id]
+        case 1:
+            sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
+            salas = [sessao.sala for sessao in sessoes]
+            mestres = [sala.mestre.id for sala in salas]
+            return mestres
+        case 2:
+            sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
+            salas = [sessao.sala for sessao in sessoes]
+            jogadores = [jogador.id for sala in salas for jogador in sala.jogadores.all()]
+            return jogadores
+        case 3:
+            return "publica"
+        
 
 def checar_permissao(objeto, permissao):
     usuarios_permitidos = lista_autorizados(objeto, permissao)
+    if usuarios_permitidos == "publica":
+        return True
     if hasattr(objeto, "usuario"):
         if objeto.usuario in usuarios_permitidos:
             return True
