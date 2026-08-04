@@ -57,7 +57,7 @@ def salvar(request, campospermitidos, objeto):
 
 def lista_autorizados(objeto, permissao):
     if permissao not in ["visibilidade", "editabilidade"]:
-        return 
+        return []
     valor_permissao = getattr(objeto, permissao)
     match valor_permissao:
         case 0:
@@ -76,20 +76,22 @@ def lista_autorizados(objeto, permissao):
             return "publica"
         
 
-def checar_permissao(objeto, permissao):
+def checar_permissao(request, objeto, permissao):
     usuarios_permitidos = lista_autorizados(objeto, permissao)
+    print("Usuário logado:", request.user.id)
+    print("Permitidos:", usuarios_permitidos)
     if usuarios_permitidos == "publica":
         return True
     if hasattr(objeto, "usuario"):
-        if objeto.usuario in usuarios_permitidos:
+        if request.user.id in usuarios_permitidos:
             return True
         return False
     if hasattr(objeto, "ficha"):
-        if objeto.ficha.usuario in usuarios_permitidos:
+        if request.user.id in usuarios_permitidos:
             return True
         return False
     if hasattr(objeto, "inventario"):
-        if objeto.inventario.ficha.usuario in usuarios_permitidos:
+        if request.user.id in usuarios_permitidos:
             return True
         return False
     return False
@@ -154,7 +156,7 @@ def ler_view(request, ficha_id, categoria):
     if not pagina:
         return JsonResponse ({"status": False, "mensagem": "Não encontrada"}, status=404)
     url = 'fichas/' + pagina
-    if not checar_permissao(ficha, "visualizacao"):
+    if not checar_permissao(request, ficha, "visibilidade"):
         return JsonResponse ({"status": False, "mensagem": "Não tem permissão de acesso"}, status=403)
     return render(request, url, {'ficha': ficha})
     
@@ -168,7 +170,7 @@ def salvar_view(request, categoria_id, categoria):
         return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
     
     objeto = get_object_or_404(modelo, id=categoria_id)
-    if not checar_permissao(objeto, "editabilidade"):
+    if not checar_permissao(request, objeto, "editabilidade"):
         return JsonResponse ({"status": False, "mensagem": "Permissão Negada"})
     
     campospermitidos = Campos_Permitidos.get(categoria, "")
@@ -201,7 +203,7 @@ def excluir_view(request, categoria_id, categoria):
     if not modelo:
         return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
     objeto = get_object_or_404(modelo, id=categoria_id)
-    if not checar_permissao(objeto, "editabilidade"):
+    if not checar_permissao(request, objeto, "editabilidade"):
         return JsonResponse ({"status": False, "mensagem": "Permissão Negada"})
     objeto.delete()
     return JsonResponse({"status": True})
