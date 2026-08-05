@@ -19,7 +19,7 @@ function adicionarFicha() {
                 button.addEventListener('click', () => {
                     const fichaId = button.getAttribute('data-ficha-id');
                     if (socket.readyState === WebSocket.OPEN) {
-                        socket.send(JSON.stringify({ mensagem: `/carregar_ficha ${fichaId}` }));
+                        socket.send(JSON.stringify({ mensagem: `/carregar_ficha/${fichaId}/${document.getElementById('codigo-sala').value}/` }));
                     };
                     document.body.removeChild(modal);
                 });
@@ -36,6 +36,50 @@ function adicionarFicha() {
             console.error('Erro ao carregar modal:', error);
             alert('Erro ao carregar fichas. Tente novamente.');
         });
+}
+
+function configurarRemocaoFicha(container) {
+    const botoes = container.querySelectorAll('.remove-item');
+    botoes.forEach(botao => {
+        botao.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const fichaId = botao.getAttribute('data-item-id');
+            retirarFicha(fichaId);
+        });
+    });
+}
+
+function retirarFicha(fichaId) {
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ mensagem: `/remover_ficha/${fichaId}/${codigoSala}/` }));
+    }
+    removerFichaNoFrontend(fichaId);
+}
+
+function removerFichaNoFrontend(fichaId) {
+    const fichaDiv = document.getElementById(`ficha-${fichaId}`);
+    if (fichaDiv) {
+        fichaDiv.remove();
+    }
+}
+
+function removerFicha(fichaId) {
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+    fetch(`/sessoes/remover_ficha/${fichaId}/${codigoSala}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': window.csrftoken
+        }
+    })
+    .then(response => response.json().catch(() => ({ status: true })))
+    .then(() => {
+        removerFichaNoFrontend(fichaId);
+    })
+    .catch(() => {
+        removerFichaNoFrontend(fichaId);
+    });
 }
 
 function alterarVisibilidade(fichaId, visibilidade) {
@@ -67,10 +111,11 @@ function carregarFicha(fichaId) {
     const div = document.createElement('div');
     div.id = `ficha-${fichaId}`;
     divmae.appendChild(div);
-    fetch(`/sessoes/carregar_ficha/${fichaId}/`)
+    fetch(`/sessoes/carregar_ficha/${fichaId}/${document.getElementById('codigo-sala').value}/`)
         .then(response => response.text())
         .then(html => {
             div.innerHTML = html;
+            configurarRemocaoFicha(div);
         })
         .catch(error => {
             console.error('Erro ao carregar ficha:', error);
@@ -110,6 +155,17 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reset();
     });
 
+    document.addEventListener('click', (event) => {
+        const botao = event.target.closest('.remove-item');
+        if (!botao) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        retirarFicha(botao.getAttribute('data-item-id'));
+    });
+
     socket.onopen = function() {
         console.log('Conexão estabelecida com sucesso.');
     };
@@ -123,6 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(data.message);
         } else if (data.type === 'carregar_ficha') {
             carregarFicha(data.ficha_id);
+        } else if (data.type === 'remover_ficha') {
+            removerFicha(data.ficha_id);
         }
     };
 
@@ -135,4 +193,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error(e);
         adicionarMensagem('Ocorreu um erro na conexão com a sala.');
     };
-})
+});

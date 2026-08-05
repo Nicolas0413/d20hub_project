@@ -8,5 +8,6 @@ urlpatterns = [
     path('entrar/', views.entrar_sala, name='entrar_sala'),
     path('sala/<str:codigo_sala>/', views.sala_rpg, name='sala_rpg'),
     path('selecionar_ficha/', views.selecionar_ficha, name='selecionar_ficha'),
-    path('carregar_ficha/<int:ficha_id>/', views.carregar_ficha, name='carregar_ficha'),
+    path('carregar_ficha/<int:ficha_id>/<str:sala_codigo>/', views.carregar_ficha, name='carregar_ficha'),
+    path('remover_ficha/<int:ficha_id>/<str:sala_codigo>/', views.remover_ficha, name='remover_ficha'),
 ]

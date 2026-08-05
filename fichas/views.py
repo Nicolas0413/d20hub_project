@@ -58,20 +58,29 @@ def salvar(request, campospermitidos, objeto):
 def lista_autorizados(objeto, permissao):
     if permissao not in ["visibilidade", "editabilidade"]:
         return []
-    valor_permissao = getattr(objeto, permissao)
+
+    ficha = objeto if isinstance(objeto, Ficha) else getattr(objeto, "ficha", None)
+    if ficha is None:
+        return []
+
+    valor_permissao = getattr(ficha, permissao)
     match valor_permissao:
         case 0:
-            return [objeto.usuario.id]
+            return [ficha.usuario.id]
         case 1:
-            sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
+            sessoes = FichaSessao.objects.filter(ficha=ficha)
             salas = [sessao.sala for sessao in sessoes]
             mestres = [sala.mestre.id for sala in salas]
+            mestres.append(ficha.usuario.id)
             return mestres
         case 2:
-            sessoes = get_list_or_404(FichaSessao, ficha=objeto.id)
+            sessoes = FichaSessao.objects.filter(ficha=ficha)
             salas = [sessao.sala for sessao in sessoes]
-            jogadores = [jogador.id for sala in salas for jogador in sala.jogadores.all()]
-            return jogadores
+            usuarios = {ficha.usuario.id}
+            for sala in salas:
+                usuarios.add(sala.mestre.id)
+                usuarios.update(sala.jogadores.values_list("id", flat=True))
+            return list(usuarios)
         case 3:
             return "publica"
         

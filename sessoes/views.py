@@ -1,7 +1,8 @@
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from sessoes.models import Sala
+from sessoes.models import Sala, FichaSessao
 from fichas.models import Ficha
 
 @login_required
@@ -18,7 +19,6 @@ def entrar_sala(request):
 
     if Sala.objects.filter(codigo=codigo).exists():
         sala = Sala.objects.get(codigo=codigo)
-        sala.jogadores.add(request.user)
         return redirect('sessoes:sala_rpg', codigo_sala=codigo)
 
     messages.error(request, "Código de sala inválido ou inexistente!")
@@ -28,7 +28,8 @@ def entrar_sala(request):
 def sala_rpg(request, codigo_sala):
     sala = get_object_or_404(Sala, codigo=codigo_sala)
     minhas_fichas = Ficha.objects.filter(usuario=request.user) 
-    
+    sala.jogadores.add(request.user)
+
     return render(request, 'sessoes/sala_rpg.html', {
         'sala': sala,
         'minhas_fichas': minhas_fichas
@@ -43,6 +44,18 @@ def selecionar_ficha(request):
     })
 
 @login_required
-def carregar_ficha(request, ficha_id):
+def carregar_ficha(request, ficha_id, sala_codigo):
     ficha = get_object_or_404(Ficha, id=ficha_id)
+    sala = get_object_or_404(Sala, codigo=sala_codigo)
+    FichaSessao.objects.create(ficha=ficha, jogador=request.user, sala=sala)
     return render(request, 'sessoes/carregar_fichas.html', {'ficha': ficha})
+
+@login_required
+def remover_ficha(request, ficha_id, sala_codigo):
+    if request.method != "POST":
+        return JsonResponse({"status": False, "mensagem": "Método inválido"}, status=405)
+
+    ficha = get_object_or_404(Ficha, id=ficha_id)
+    sala = get_object_or_404(Sala, codigo=sala_codigo)
+    FichaSessao.objects.filter(ficha=ficha, jogador=request.user, sala=sala).delete()
+    return JsonResponse({"status": True})
