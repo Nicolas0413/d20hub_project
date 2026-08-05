@@ -14,7 +14,7 @@
     <script src="{% static 'js/sala_rpg.js' %}?v=9999.13" defer></script>
 </head>
 <body>
-    <div class="accordion accordion-custom" id="accordionExample">
+    <div class="accordion accordion-custom" id="fichasAccordion">
         <div class="accordion-item">
             <h2 class="accordion-header">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#ficha{{ ficha.id }}" aria-expanded="false" aria-controls="ficha{{ ficha.id }}">
@@ -41,9 +41,9 @@
                     </div>
                 </button>
             </h2>
-            <div id="ficha{{ ficha.id }}" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div id="ficha{{ ficha.id }}" class="accordion-collapse collapse" data-bs-parent="#fichasAccordion">
                 <div class="accordion-body">
-                    <p>Link para a ficha: <a href="{% url 'fichas:ler' ficha_id=ficha.id categoria='ficha' %}">{{ ficha.nome }}</a></p>
+                    <p><a href="{% url 'fichas:ler' ficha_id=ficha.id categoria='ficha' %}">Visualizar</a></p>
                     <button type="button" class="remove-item" data-item-id="{{ ficha.id }}">
                         Retirar Ficha
                     </button>
