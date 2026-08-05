@@ -1,10 +1,14 @@
 import json
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.contrib.auth.decorators import login_required
+
+from sessoes.models import FichaSessao, Sala
 from .models import Estatisticas, Ficha, Pericia, Habilidade, Item, Ataque, Inventario
 from django.core.serializers.json import DjangoJSONEncoder
 import traceback
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 # Dicts uteis
 
@@ -26,7 +30,7 @@ Paginas = {
 }
 
 Campos_Permitidos = {
-    "ficha": ["nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4"],
+    "ficha": ["visibilidade", "editabilidade", "nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4"],
     "ataque": ["nome", "dano", "critico"],
     "pericia": ["nome", "descricao", "pagina", "dados", "bonus", "treinamento"],
     "habilidade": ["nome", "descricao", "pagina", "custo"],
@@ -51,14 +55,41 @@ def salvar(request, campospermitidos, objeto):
     objeto.save()
     return {"status": True}
 
-def checar_permissao(request, objeto):
-    if hasattr(objeto, "usuario"):
-        return objeto.usuario == request.user
-    if hasattr(objeto, "ficha"):
-        return objeto.ficha.usuario == request.user
-    if hasattr(objeto, "inventario"):
-        return objeto.inventario.ficha.usuario == request.user
-    return False
+def lista_autorizados(objeto, permissao):
+    if permissao not in ["visibilidade", "editabilidade"]:
+        return []
+
+    ficha = objeto if isinstance(objeto, Ficha) else getattr(objeto, "ficha", None)
+    if ficha is None:
+        return []
+
+    valor_permissao = getattr(ficha, permissao)
+    match valor_permissao:
+        case 0:
+            return [ficha.usuario.id]
+        case 1:
+            sessoes = FichaSessao.objects.filter(ficha=ficha)
+            salas = [sessao.sala for sessao in sessoes]
+            mestres = [sala.mestre.id for sala in salas]
+            mestres.append(ficha.usuario.id)
+            return mestres
+        case 2:
+            sessoes = FichaSessao.objects.filter(ficha=ficha)
+            salas = [sessao.sala for sessao in sessoes]
+            usuarios = {ficha.usuario.id}
+            for sala in salas:
+                usuarios.add(sala.mestre.id)
+                usuarios.update(sala.jogadores.values_list("id", flat=True))
+            return list(usuarios)
+        case 3:
+            return "publica"
+        
+
+def checar_permissao(request, objeto, permissao):
+    usuarios_permitidos = lista_autorizados(objeto, permissao)
+    if usuarios_permitidos == "publica":
+        return True
+    return request.user.id in usuarios_permitidos
 
 def limpar_ficha(ficha_id):
     ficha = get_object_or_404(Ficha, id=ficha_id)       
@@ -115,11 +146,13 @@ def criar_view(request, ficha_id, categoria):
 
 @login_required
 def ler_view(request, ficha_id, categoria):
-    ficha = get_object_or_404(Ficha, id=ficha_id, usuario=request.user)
+    ficha = get_object_or_404(Ficha, id=ficha_id)
     pagina = Paginas.get(categoria)
     if not pagina:
         return JsonResponse ({"status": False, "mensagem": "Não encontrada"}, status=404)
     url = 'fichas/' + pagina
+    if not checar_permissao(request, ficha, "visibilidade"):
+        return JsonResponse ({"status": False, "mensagem": "Não tem permissão de acesso"}, status=403)
     return render(request, url, {'ficha': ficha})
     
 @login_required
@@ -132,7 +165,7 @@ def salvar_view(request, categoria_id, categoria):
         return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
     
     objeto = get_object_or_404(modelo, id=categoria_id)
-    if not checar_permissao(request, objeto):
+    if not checar_permissao(request, objeto, "editabilidade"):
         return JsonResponse ({"status": False, "mensagem": "Permissão Negada"})
     
     campospermitidos = Campos_Permitidos.get(categoria, "")
@@ -165,12 +198,10 @@ def excluir_view(request, categoria_id, categoria):
     if not modelo:
         return JsonResponse ({"status": False, "mensagem": "Categoria inexistente"})
     objeto = get_object_or_404(modelo, id=categoria_id)
-    if not checar_permissao(request, objeto):
+    if not checar_permissao(request, objeto, "editabilidade"):
         return JsonResponse ({"status": False, "mensagem": "Permissão Negada"})
     objeto.delete()
     return JsonResponse({"status": True})
-
-
 
 @login_required
 def exportar_view(request, ficha_id):

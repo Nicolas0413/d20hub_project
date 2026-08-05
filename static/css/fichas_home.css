@@ -34,8 +34,8 @@ button {
 button:hover {
     cursor: pointer;
     background-color: rgb(247, 40, 40);
-    transform: translateY(-3px);
-    box-shadow: 0px 0px 5px 5px rgb(131, 21, 2);
+    scale: 1.03;
+    box-shadow: 0px 0px 1px 5px rgb(131, 21, 2);
 }
 
 button:active {

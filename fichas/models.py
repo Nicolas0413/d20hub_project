@@ -3,6 +3,8 @@ from django.conf import settings
 
 class Ficha(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="fichas")
+    visibilidade = models.IntegerField(choices=[(0, 'Privada'), (1, 'Mestre'), (2, 'Sala'), (3, 'Pública')], default=0)
+    editabilidade = models.IntegerField(choices=[(0, 'Privada'), (1, 'Mestre'), (2, 'Sala'), (3, 'Pública')], default=0)
     nome = models.CharField(max_length=64, default="")
     personagem = models.CharField(max_length=64, default="Nome do personagem")
     foto_personagem = models.ImageField(upload_to='fotos_fichas/', default="fotos_fichas/Aguiar.jpg")

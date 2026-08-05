@@ -71,6 +71,7 @@ if (document.getElementById("pvAtual")) { /* se página for ficha.html / tiver b
     document.getElementById("importJson").addEventListener("change", window.importarFichaJSON);
 };
 
+
 /* Funções */
 
 function editar() {
