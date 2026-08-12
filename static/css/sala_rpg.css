@@ -178,3 +178,27 @@ input {
     padding: 2px 10px 2px 10px;
     box-shadow: 0px 0px 10px 2px rgb(131, 21, 2);
 }
+
+.accordion-button:focus {
+    border-color: rgb(192, 33, 33) !important;
+    box-shadow: none !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: rgb(192, 33, 33) !important;
+    color: white !important;
+    box-shadow: none !important;
+}
+
+#fichas {
+    width: 80vw;
+}
+
+#fichas div {
+    display: inline-block;
+    width: 300px;
+    margin: 10px;
+}
+#fichas button {
+    display: block;
+}
