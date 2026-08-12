@@ -28,6 +28,9 @@
     </form>
     <div id="mensagens"></div>
     <div id="fichas">
+        {% for ficha in fichas %}
+            carregarFicha(ficha.id)
+        {% endfor %}
         <button type="button" class="edit-btn" onclick="adicionarFicha()">Adicionar Ficha</button>
     </div>
 </body>

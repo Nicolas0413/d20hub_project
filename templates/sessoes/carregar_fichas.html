@@ -43,7 +43,7 @@
             </h2>
             <div id="ficha{{ ficha.id }}" class="accordion-collapse collapse" data-bs-parent="#fichasAccordion">
                 <div class="accordion-body">
-                    <p><a href="{% url 'fichas:ler' ficha_id=ficha.id categoria='ficha' %}">Visualizar</a></p>
+                    <p><a href="{% url 'fichas:ler' ficha_id=ficha.id categoria='ficha' %}" target="_blank">Visualizar</a></p>
                     <button type="button" class="remove-item" data-item-id="{{ ficha.id }}">
                         Retirar Ficha
                     </button>

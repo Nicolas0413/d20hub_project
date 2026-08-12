@@ -28,12 +28,9 @@ def entrar_sala(request):
 def sala_rpg(request, codigo_sala):
     sala = get_object_or_404(Sala, codigo=codigo_sala)
     minhas_fichas = Ficha.objects.filter(usuario=request.user) 
-    sala.jogadores.add(request.user)
-
-    return render(request, 'sessoes/sala_rpg.html', {
-        'sala': sala,
-        'minhas_fichas': minhas_fichas
-    })
+    sala.jogadores.add(request.user) 
+    salas = FichaSessao.objects.filter(sala=sala)
+    return render(request, 'sessoes/sala_rpg.html', {'sala': sala, 'minhas_fichas': minhas_fichas, 'fichas': fichas})
 
 @login_required
 def selecionar_ficha(request):
