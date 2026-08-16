@@ -1,34 +1,44 @@
 let socket;
 
 function adicionarFicha() {
-    fetch(typeof selecionarFichaUrl !== 'undefined' ? selecionarFichaUrl : '/sessoes/selecionar-ficha/')
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+
+    const url = codigoSala
+        ? `${selecionarFichaUrl}?codigo_sala=${encodeURIComponent(codigoSala)}`
+        : (typeof selecionarFichaUrl !== 'undefined'
+            ? selecionarFichaUrl
+            : '/sessoes/selecionar-ficha/');
+
+    fetch(url)
         .then(response => response.text())
         .then(html => {
             const modal = document.createElement('div');
-            modal.classList.add('modal-wrapper');
+            modal.classList.add('modal-overlay');
             modal.innerHTML = html;
+
             document.body.appendChild(modal);
 
-            const closeModalBtn = modal.querySelector('.close-modal');
-            closeModalBtn.addEventListener('click', () => {
-                document.body.removeChild(modal);
-            });
+            const fecharModal = () => modal.remove();
 
-            const fichaButtons = modal.querySelectorAll('.carregar-ficha');
-            fichaButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const fichaId = button.getAttribute('data-ficha-id');
-                    if (socket.readyState === WebSocket.OPEN) {
-                        socket.send(JSON.stringify({ mensagem: `/carregar_ficha/${fichaId}/${document.getElementById('codigo-sala').value}/` }));
-                    };
-                    document.body.removeChild(modal);
+            modal.querySelectorAll('.ficha-item').forEach(ficha => {
+                ficha.addEventListener('click', () => {
+                    const fichaId = ficha.dataset.fichaId;
+                    const codigo = document.getElementById('codigo-sala')?.value;
+
+                    if (socket?.readyState === WebSocket.OPEN) {
+                        socket.send(JSON.stringify({
+                            mensagem: `/carregar_ficha/${fichaId}/${codigo}/`
+                        }));
+                    }
+
+                    fecharModal();
                 });
             });
 
-            // Fechar modal ao clicar fora
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    document.body.removeChild(modal);
+            // Clicar fora do modal fecha
+            modal.addEventListener('click', event => {
+                if (event.target === modal) {
+                    fecharModal();
                 }
             });
         })
@@ -82,35 +92,73 @@ function removerFicha(fichaId) {
     });
 }
 
+function atualizarFichaNoFrontend(fichaId) {
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+    const fichaDiv = document.getElementById(`ficha-${fichaId}`);
+
+    if (!fichaDiv || !codigoSala) {
+        return;
+    }
+
+    fetch(`/sessoes/carregar_ficha/${fichaId}/${codigoSala}/`)
+        .then(response => response.text())
+        .then(html => {
+            fichaDiv.innerHTML = html;
+            configurarRemocaoFicha(fichaDiv);
+        })
+        .catch(error => {
+            console.error('Erro ao atualizar ficha:', error);
+        });
+}
+
 function alterarVisibilidade(fichaId, visibilidade) {
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+    
     fetch(`/fichas/${fichaId}/ficha/salvar/`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": window.csrftoken
+            'Content-Type': 'application/json',
+            'X-CSRFToken': window.csrftoken
         },
         body: JSON.stringify({
-            campo: 'visibilidade',   
+            campo: 'visibilidade',
             valor: visibilidade
         })
     })
     .then(res => res.json())
     .then(data => {
+        if (data.status) {
+            if (socket && socket.readyState === WebSocket.OPEN && codigoSala) {
+                socket.send(JSON.stringify({ 
+                    mensagem: `/atualizar_visibilidade/${fichaId}/${visibilidade}/${codigoSala}/` 
+                }));
+            }
+            atualizarFichaNoFrontend(fichaId);
+            return;
+        }
+
         if (data.mensagem) {
             alert(data.mensagem);
+        } else {
+            alert('Erro ao salvar a visibilidade. Tente novamente.');
         }
-        if (!data.status) {
-            alert(`Erro ao salvar ${tipo}! Tente novamente.`);
-        }
+    })
+    .catch(error => {
+        console.error('Erro ao alterar visibilidade:', error);
+        alert('Erro ao salvar a visibilidade. Tente novamente.');
     });
 }
 
 function carregarFicha(fichaId) {
-    console.log('Carregando ficha:', fichaId);
     const divmae = document.getElementById('fichas');
+    if (!divmae || document.getElementById(`ficha-${fichaId}`)) {
+        return;
+    }
+
     const div = document.createElement('div');
     div.id = `ficha-${fichaId}`;
     divmae.appendChild(div);
+
     fetch(`/sessoes/carregar_ficha/${fichaId}/${document.getElementById('codigo-sala').value}/`)
         .then(response => response.text())
         .then(html => {
@@ -125,35 +173,41 @@ function carregarFicha(fichaId) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const protocolo = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const codigoSala = document.getElementById('codigo-sala').value;
-    const url = `${protocolo}://${window.location.host}/ws/sala/${codigoSala}/`;
-    socket = new WebSocket(url);
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+    const url = codigoSala ? `${protocolo}://${window.location.host}/ws/sala/${codigoSala}/` : null;
+
+    if (url) {
+        socket = new WebSocket(url);
+    }
+
     const form = document.getElementById('form');
     const mensagens = document.getElementById('mensagens');
 
     function adicionarMensagem(texto) {
+        if (!mensagens) return;
         const p = document.createElement('p');
         p.textContent = texto;
         mensagens.appendChild(p);
     }
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const mensagem = e.target.mensagem.value.trim();
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const mensagem = e.target.mensagem.value.trim();
 
-        if (!mensagem) {
-            return;
-        }
+            if (!mensagem) {
+                return;
+            }
 
-        if (socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({ mensagem }));
-            mensagem.value = '';
-        } else {
-            adicionarMensagem('A conexão ainda não está pronta. Tente novamente.');
-        }
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ mensagem }));
+            } else {
+                adicionarMensagem('A conexão ainda não está pronta. Tente novamente.');
+            }
 
-        form.reset();
-    });
+            form.reset();
+        });
+    }
 
     document.addEventListener('click', (event) => {
         const botao = event.target.closest('.remove-item');
@@ -166,31 +220,40 @@ document.addEventListener('DOMContentLoaded', () => {
         retirarFicha(botao.getAttribute('data-item-id'));
     });
 
-    socket.onopen = function() {
-        console.log('Conexão estabelecida com sucesso.');
-    };
+    if (socket) {
+        socket.onopen = function() {
+            console.log('Conexão estabelecida com sucesso.');
+        };
 
-    socket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
 
-        if (data.type === 'chat_message') {
-            adicionarMensagem(`${data.nome}: ${data.mensagem}`);
-        } else if (data.type === 'system') {
-            console.log(data.message);
-        } else if (data.type === 'carregar_ficha') {
-            carregarFicha(data.ficha_id);
-        } else if (data.type === 'remover_ficha') {
-            removerFicha(data.ficha_id);
-        }
-    };
+            if (data.type === 'chat_message') {
+                adicionarMensagem(`${data.nome}: ${data.mensagem}`);
+            } else if (data.type === 'system') {
+                console.log(data.message);
+            } else if (data.type === 'carregar_ficha') {
+                carregarFicha(data.ficha_id);
+            } else if (data.type === 'remover_ficha') {
+                removerFicha(data.ficha_id);
+            } else if (data.type === 'atualizar_visibilidade') {
+                atualizarFichaNoFrontend(data.ficha_id);
+            }
+        };
 
-    socket.onclose = function() {
-        console.log('Conexão encerrada.');
-        adicionarMensagem('A conexão foi encerrada.');
-    };
+        socket.onclose = function() {
+            console.log('Conexão encerrada.');
+            adicionarMensagem('A conexão foi encerrada.');
+        };
 
-    socket.onerror = function(e) {
-        console.error(e);
-        adicionarMensagem('Ocorreu um erro na conexão com a sala.');
-    };
+        socket.onerror = function(e) {
+            console.error(e);
+            adicionarMensagem('Ocorreu um erro na conexão com a sala.');
+        };
+    }
+
+    const fichasParaCarregar = Array.from(new Set(Array.isArray(window.fichasSessao) ? window.fichasSessao : []));
+    fichasParaCarregar.forEach(fichaId => {
+        if (fichaId) carregarFicha(fichaId);
+    });
 });

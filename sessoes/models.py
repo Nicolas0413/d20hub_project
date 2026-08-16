@@ -19,3 +19,6 @@ class FichaSessao(models.Model):
     sala = models.ForeignKey(Sala, on_delete=models.CASCADE, related_name="fichas_linkadas")
     ficha = models.ForeignKey(Ficha, on_delete=models.CASCADE)
     jogador = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (('sala', 'ficha'),)

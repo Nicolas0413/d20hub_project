@@ -90,6 +90,21 @@ class SalaConsumer(WebsocketConsumer):
                     'type': 'system',
                     'message': 'Uso correto: /remover_ficha <id_da_ficha>'
                 }))
+        elif mensagem.startswith('/atualizar_visibilidade'):
+            parts = mensagem.split('/')
+            ficha_id = parts[2] if len(parts) > 2 else None
+            visibilidade = parts[3] if len(parts) > 3 else None
+            codigo_sala = parts[4] if len(parts) > 4 else None
+            if ficha_id and visibilidade and codigo_sala:
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'atualizar_visibilidade',
+                        'ficha_id': ficha_id,
+                        'visibilidade': visibilidade,
+                        'codigo_sala': codigo_sala
+                    }
+                )
         else:
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -118,5 +133,13 @@ class SalaConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'type': 'remover_ficha',
             'ficha_id': event.get('ficha'),
+            'codigo_sala': event.get('codigo_sala')
+        }))
+
+    def atualizar_visibilidade(self, event):
+        self.send(text_data=json.dumps({
+            'type': 'atualizar_visibilidade',
+            'ficha_id': event.get('ficha_id'),
+            'visibilidade': event.get('visibilidade'),
             'codigo_sala': event.get('codigo_sala')
         }))

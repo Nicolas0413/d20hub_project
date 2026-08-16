@@ -29,12 +29,18 @@ def sala_rpg(request, codigo_sala):
     sala = get_object_or_404(Sala, codigo=codigo_sala)
     minhas_fichas = Ficha.objects.filter(usuario=request.user) 
     sala.jogadores.add(request.user) 
-    salas = FichaSessao.objects.filter(sala=sala)
-    return render(request, 'sessoes/sala_rpg.html', {'sala': sala, 'minhas_fichas': minhas_fichas, 'fichas': fichas})
+    fichas_sessao = FichaSessao.objects.filter(sala=sala)
+    return render(request, 'sessoes/sala_rpg.html', {'sala': sala, 'minhas_fichas': minhas_fichas, 'fichas_sessao': fichas_sessao})
 
 @login_required
 def selecionar_ficha(request):
+    codigo_sala = request.GET.get('codigo_sala')
     minhas_fichas = Ficha.objects.filter(usuario=request.user)
+
+    if codigo_sala:
+        fichas_ja_na_sala = FichaSessao.objects.filter(sala__codigo=codigo_sala).values_list('ficha_id', flat=True)
+        minhas_fichas = minhas_fichas.exclude(id__in=fichas_ja_na_sala)
+
     fichas = [(ficha.id, ficha.nome) for ficha in minhas_fichas]
     return render(request, 'sessoes/selecionar_ficha.html', {
         'fichas': fichas
@@ -44,7 +50,7 @@ def selecionar_ficha(request):
 def carregar_ficha(request, ficha_id, sala_codigo):
     ficha = get_object_or_404(Ficha, id=ficha_id)
     sala = get_object_or_404(Sala, codigo=sala_codigo)
-    FichaSessao.objects.create(ficha=ficha, jogador=request.user, sala=sala)
+    FichaSessao.objects.get_or_create(ficha=ficha, sala=sala, defaults={'jogador': request.user})
     return render(request, 'sessoes/carregar_fichas.html', {'ficha': ficha})
 
 @login_required

@@ -17,7 +17,7 @@
     <div class="accordion accordion-custom" id="fichasAccordion">
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#ficha{{ ficha.id }}" aria-expanded="false" aria-controls="ficha{{ ficha.id }}">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ficha{{ ficha.id }}" aria-expanded="false" aria-controls="ficha{{ ficha.id }}">
                     <div class="item-row" style="width:100%">
                         <p>Ficha: {{ ficha.nome }}</p>
                         <p>Usuário: {{ ficha.usuario }}</p>
@@ -25,9 +25,13 @@
                             <p>Visibilidade: 
                                 <form method="post" class="d-inline-block">
                                     {% csrf_token %}
-                                    <select data-id="{{ ficha.id }}" class="form-select form-select-sm d-inline-block w-auto" 
-                                            onclick="event.stopPropagation()" 
-                                            onchange="alterarVisibilidade(this.dataset.id, this.value)">
+                                    <select
+                                        data-id="{{ ficha.id }}"
+                                        class="form-select form-select-sm d-inline-block w-auto"
+                                        onclick="event.stopPropagation()"
+                                        mousedown="event.stopPropagation()"
+                                        onchange="alterarVisibilidade(this.dataset.id, this.value)"
+                                    >
                                         <option value="3" {% if ficha.visibilidade == 3 %}selected{% endif %}>Pública</option>
                                         <option value="2" {% if ficha.visibilidade == 2 %}selected{% endif %}>Sala</option>
                                         <option value="1" {% if ficha.visibilidade == 1 %}selected{% endif %}>Mestre</option>
@@ -36,7 +40,7 @@
                                 </form>
                             </p>
                         {% else %}
-                            <p>Visibilidade: {{ ficha.visibilidade }}</p>
+                            <p>Visibilidade: {{ ficha.get_visibilidade_display }}</p>
                         {% endif %}
                     </div>
                 </button>

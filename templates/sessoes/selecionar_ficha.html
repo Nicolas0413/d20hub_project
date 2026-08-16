@@ -1,24 +1,19 @@
-<div class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Selecionar Ficha</h2>
-            <button class="close-modal">&times;</button>
-        </div>
-        <div class="modal-body">
-            {% if fichas %}
-                <div class="ficha-list">
-                    {% for id, nome in fichas %}
-                        <div class="ficha-item">
-                            <span class="ficha-nome">{{ nome }}</span>
-                            <button class="carregar-ficha" data-ficha-id="{{ id }}">
-                                Carregar
-                            </button>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>Você não possui fichas criadas.</p>
-            {% endif %}
-        </div>
+<div class="modal-content">
+    <div class="modal-header">
+        <h2>Selecionar Ficha</h2>
+    </div>
+
+    <div class="modal-body">
+        {% if fichas %}
+            <div class="ficha-list">
+                {% for id, nome in fichas %}
+                    <div class="ficha-item" data-ficha-id="{{ id }}">
+                        <span class="ficha-nome">{{ nome }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Você não possui fichas válidas para serem selecionadas.</p>
+        {% endif %}
     </div>
 </div>

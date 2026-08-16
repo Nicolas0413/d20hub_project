@@ -6,9 +6,8 @@
     {% load static %}
     <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
     <title>D20HUB</title>
-
-    <link rel="stylesheet" href="{% static 'css/fichas_home.css' %}">
-    <script src="{% static 'js/scripts.js' %}?v=1.2" defer></script>
+    <link rel="stylesheet" href="{% static 'css/fichas_home.css' %}?v=1.22">
+    <script src="{% static 'js/scripts.js' %}?v=1.22" defer></script>
     <script>
         window.csrftoken = '{{ csrf_token }}';
     </script>
@@ -17,7 +16,6 @@
     <div class="toolbar">
         <h2 id="contadorFichas">Fichas: 0/15</h2>
         <div class="botoesToolbar">
-            <!-- <p><a href="{% url 'core:home' %}">Retornar</a></p> -->
             <button class="novaficha" id="limparFichas">Limpar fichas</button>
             <button class="novaficha" id="criarFicha">Criar ficha</button>
         </div>
@@ -26,6 +24,5 @@
     <div id="fichasContainer">
 
     </div>
-    
 </body>
 </html>

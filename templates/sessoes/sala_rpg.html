@@ -16,22 +16,33 @@
         const selecionarFichaUrl = "{% url 'sessoes:selecionar_ficha' %}";
         window.csrftoken = '{{ csrf_token }}';
     </script>
-    <script src="{% static 'js/sala_rpg.js' %}?v=9999.19" defer></script>
+    <script src="{% static 'js/sala_rpg.js' %}?v=9999.21" defer></script>
     <title>Sala</title>
 </head>
 <body>
-    <a href="{% url 'sessoes:entrar_sala' %}" id="retornar">Retornar</a>
-    <h1>Mesa de RPG</h1>
-    <input type="hidden" id="codigo-sala" value="{{ sala.codigo }}">
-    <form id="form" autocomplete="off">
-        <input type="text" name="mensagem" id="mensagem" placeholder="Digite sua mensagem...">
-    </form>
-    <div id="mensagens"></div>
-    <div id="fichas">
-        {% for ficha in fichas %}
-            carregarFicha(ficha.id)
-        {% endfor %}
-        <button type="button" class="edit-btn" onclick="adicionarFicha()">Adicionar Ficha</button>
+    <div class="toolbar">
+        <a href="{% url 'sessoes:entrar_sala' %}" id="retornar">Retornar</a>
+        <h1>Mesa de RPG</h1>
     </div>
+    <input type="hidden" id="codigo-sala" value="{{ sala.codigo }}">
+    <div id="conteudo">
+        <div id="fichas">
+            <button type="button" class="edit-btn" onclick="adicionarFicha()">Adicionar Ficha</button>
+        </div>
+        <div id="chat">
+            <div id="mensagens"></div>
+            <form id="form" autocomplete="off">
+                <input type="text" name="mensagem" id="mensagem" placeholder="Digite sua mensagem...">
+            </form>
+        </div>
+    </div>
+
+    <script>
+        window.fichasSessao = [
+            {% for ficha_sessao in fichas_sessao %}
+                {{ ficha_sessao.ficha.id }},
+            {% endfor %}
+        ];
+    </script>
 </body>
 </html>
