@@ -7,27 +7,20 @@ from .models import FichaSessao, Sala
 
 class SalaConsumer(WebsocketConsumer):
     def connect(self):
-        try:
-            self.codigo_sala = self.scope['url_route']['kwargs']['codigo_sala']
-            self.room_group_name = f"sala_{self.codigo_sala}"
+    self.codigo_sala = self.scope['url_route']['kwargs']['codigo_sala']
+    self.room_group_name = f"sala_{self.codigo_sala}"
 
-            self.accept()
+    self.accept()
 
-            async_to_sync(self.channel_layer.group_add)(
-                self.room_group_name,
-                self.channel_name,
-            )
+    async_to_sync(self.channel_layer.group_add)(
+        self.room_group_name,
+        self.channel_name,
+    )
 
-            self.send(text_data=json.dumps({
-                'type': 'system',
-                'message': f'Conectado à sala {self.codigo_sala}.'
-            }))
-        except Exception as e:
-            self.send(text_data=json.dumps({
-                'type': 'system',
-                'message': f'Erro na conexão: {e}'
-            }))
-            self.close()
+    self.send(text_data=json.dumps({
+        'type': 'system',
+        'message': f'Conectado à sala {self.codigo_sala}.'
+    }))
 
     def disconnect(self, close_code):
         if hasattr(self, 'room_group_name'):
