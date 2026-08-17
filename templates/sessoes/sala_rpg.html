@@ -16,13 +16,13 @@
         const selecionarFichaUrl = "{% url 'sessoes:selecionar_ficha' %}";
         window.csrftoken = '{{ csrf_token }}';
     </script>
-    <script src="{% static 'js/sala_rpg.js' %}?v=9999.21" defer></script>
+    <script src="{% static 'js/sala_rpg.js' %}?v=9999.22" defer></script>
     <title>Sala</title>
 </head>
 <body>
     <div class="toolbar">
         <a href="{% url 'sessoes:entrar_sala' %}" id="retornar">Retornar</a>
-        <h1>Mesa de RPG</h1>
+        <h1>Mesa de RPG: {{ sala.codigo }}</h1>
     </div>
     <input type="hidden" id="codigo-sala" value="{{ sala.codigo }}">
     <div id="conteudo">

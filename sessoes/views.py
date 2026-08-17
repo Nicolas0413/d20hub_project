@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from sessoes.models import Sala, FichaSessao
 from fichas.models import Ficha
+from fichas.views import checar_permissao
 
 @login_required
 def criar_sala(request):
@@ -51,7 +52,8 @@ def carregar_ficha(request, ficha_id, sala_codigo):
     ficha = get_object_or_404(Ficha, id=ficha_id)
     sala = get_object_or_404(Sala, codigo=sala_codigo)
     FichaSessao.objects.get_or_create(ficha=ficha, sala=sala, defaults={'jogador': request.user})
-    return render(request, 'sessoes/carregar_fichas.html', {'ficha': ficha})
+    pode_ver = checar_permissao(request, ficha, 'visibilidade')
+    return render(request, 'sessoes/carregar_fichas.html', {'ficha': ficha, 'pode_ver': pode_ver})
 
 @login_required
 def remover_ficha(request, ficha_id, sala_codigo):

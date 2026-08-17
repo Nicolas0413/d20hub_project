@@ -41,14 +41,18 @@
       <div class="top">
         <div class="image-wrapper">
           <img src="{{ ficha.foto_personagem.url }}" data-save="foto_personagem" class="photo" id="charImage" alt="Foto do personagem">
-          <input type="file" id="imageInput" accept="image/*" hidden data-save="foto_personagem" class="foto">
+          {% if pode_editar %}
+            <input type="file" id="imageInput" accept="image/*" hidden data-save="foto_personagem" class="foto">
+          {% endif %} 
         </div>
         <div class="info">
           <div class="name-row">
             <input class="editable name" disabled value="{{ ficha.personagem }}" data-save="personagem">
-            <button class="edit-icon" id="editBtn" onclick="editar()">
-              <i class="bi bi-pencil-square"></i>
-            </button>
+            {% if pode_editar %}
+                <button class="edit-icon" id="editBtn" onclick="editar()">
+                    <i class="bi bi-pencil-square"></i>
+                </button>
+            {% endif %} 
           </div>
           <div class="level">
             <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp

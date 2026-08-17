@@ -51,9 +51,20 @@ def salvar(request, campospermitidos, objeto):
         if not hasattr(objeto, relacao): 
             return {"status": False, "mensagem": "Relação inválida."}
         objeto = getattr(objeto, relacao)
+    # Garantir tipos corretos para campos numéricos de permissão
+    if campo in ("visibilidade", "editabilidade"):
+        try:
+            valor = int(valor)
+        except (TypeError, ValueError):
+            return {"status": False, "mensagem": "Valor inválido para campo numérico."}
+
     setattr(objeto, campo, valor)
     objeto.save()
-    return {"status": True}
+    try:
+        valor_salvo = getattr(objeto, campo)
+    except Exception:
+        valor_salvo = None
+    return {"status": True, "campo": campo, "valor": valor_salvo}
 
 def lista_autorizados(objeto, permissao):
     if permissao not in ["visibilidade", "editabilidade"]:
@@ -148,12 +159,31 @@ def criar_view(request, ficha_id, categoria):
 def ler_view(request, ficha_id, categoria):
     ficha = get_object_or_404(Ficha, id=ficha_id)
     pagina = Paginas.get(categoria)
+
     if not pagina:
-        return JsonResponse ({"status": False, "mensagem": "Não encontrada"}, status=404)
+        return JsonResponse(
+            {"status": False, "mensagem": "Não encontrada"},
+            status=404
+        )
+
     url = 'fichas/' + pagina
+
     if not checar_permissao(request, ficha, "visibilidade"):
-        return JsonResponse ({"status": False, "mensagem": "Não tem permissão de acesso"}, status=403)
-    return render(request, url, {'ficha': ficha})
+        return JsonResponse(
+            {"status": False, "mensagem": "Não tem permissão de acesso"},
+            status=403
+        )
+
+    pode_editar = checar_permissao(
+        request,
+        ficha,
+        "editabilidade"
+    )
+
+    return render(request, url, {
+        'ficha': ficha,
+        'pode_editar': pode_editar
+    })
     
 @login_required
 def salvar_view(request, categoria_id, categoria):
@@ -172,7 +202,12 @@ def salvar_view(request, categoria_id, categoria):
     dados = salvar(request, campospermitidos, objeto)
     status = dados["status"]
     mensagem = dados.get("mensagem", "")
-    return JsonResponse ({"status": status, "mensagem": mensagem})
+    resposta = {"status": status, "mensagem": mensagem}
+    if status:
+        # incluir campo/valor salvo para diagnóstico
+        resposta['campo'] = dados.get('campo')
+        resposta['valor'] = dados.get('valor')
+    return JsonResponse (resposta)
 
 @login_required
 def salvar_imagem_view(request, ficha_id, categoria):
