@@ -94,9 +94,12 @@ function removerFicha(fichaId) {
 
 function atualizarFichaNoFrontend(fichaId) {
     const codigoSala = document.getElementById('codigo-sala')?.value;
-    const fichaDiv = document.getElementById(`ficha-${fichaId}`);
+    const fichaDiv = document.querySelector(`[data-ficha-id="${fichaId}"]`)
+        || document.getElementById(`ficha-${fichaId}`)
+        || document.getElementById(`ficha${fichaId}`);
 
     if (!fichaDiv || !codigoSala) {
+        console.warn('Container da ficha não encontrado para atualização:', fichaId);
         return;
     }
 
@@ -104,6 +107,7 @@ function atualizarFichaNoFrontend(fichaId) {
         .then(response => response.text())
         .then(html => {
             fichaDiv.innerHTML = html;
+            fichaDiv.dataset.fichaId = fichaId;
             configurarRemocaoFicha(fichaDiv);
         })
         .catch(error => {
@@ -127,6 +131,7 @@ function alterarVisibilidade(fichaId, visibilidade) {
     })
     .then(res => res.json())
     .then(data => {
+        console.log('Resposta salvar visibilidade:', data);
         if (data.status) {
             if (socket && socket.readyState === WebSocket.OPEN && codigoSala) {
                 socket.send(JSON.stringify({ 
@@ -149,20 +154,61 @@ function alterarVisibilidade(fichaId, visibilidade) {
     });
 }
 
+function alterarEditabilidade(fichaId, editabilidade) {
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+    
+    fetch(`/fichas/${fichaId}/ficha/salvar/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': window.csrftoken
+        },
+        body: JSON.stringify({
+            campo: 'editabilidade',
+            valor: editabilidade
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('Resposta salvar editabilidade:', data);
+        if (data.status) {
+            if (socket && socket.readyState === WebSocket.OPEN && codigoSala) {
+                socket.send(JSON.stringify({ 
+                    mensagem: `/atualizar_editabilidade/${fichaId}/${editabilidade}/${codigoSala}/` 
+                }));
+            }
+            atualizarFichaNoFrontend(fichaId);
+            return;
+        }
+
+        if (data.mensagem) {
+            alert(data.mensagem);
+        } else {
+            alert('Erro ao salvar a editabilidade. Tente novamente.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao alterar editabilidade:', error);
+        alert('Erro ao salvar a editabilidade. Tente novamente.');
+    });
+}
+
 function carregarFicha(fichaId) {
     const divmae = document.getElementById('fichas');
-    if (!divmae || document.getElementById(`ficha-${fichaId}`)) {
+    if (!divmae || document.querySelector(`[data-ficha-id="${fichaId}"]`)) {
         return;
     }
 
     const div = document.createElement('div');
     div.id = `ficha-${fichaId}`;
+    div.dataset.fichaId = fichaId;
     divmae.appendChild(div);
 
     fetch(`/sessoes/carregar_ficha/${fichaId}/${document.getElementById('codigo-sala').value}/`)
         .then(response => response.text())
         .then(html => {
             div.innerHTML = html;
+            div.dataset.fichaId = fichaId;
             configurarRemocaoFicha(div);
         })
         .catch(error => {
@@ -233,11 +279,14 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (data.type === 'system') {
                 console.log(data.message);
             } else if (data.type === 'carregar_ficha') {
-                carregarFicha(data.ficha_id);
+                const fichaId = data.ficha_id ?? data.ficha;
+                if (fichaId) carregarFicha(fichaId);
             } else if (data.type === 'remover_ficha') {
-                removerFicha(data.ficha_id);
-            } else if (data.type === 'atualizar_visibilidade') {
-                atualizarFichaNoFrontend(data.ficha_id);
+                const fichaId = data.ficha_id ?? data.ficha;
+                if (fichaId) removerFichaNoFrontend(fichaId);
+            } else if (data.type === 'atualizar_visibilidade' || data.type === 'atualizar_editabilidade') {
+                const fichaId = data.ficha_id ?? data.ficha;
+                if (fichaId) atualizarFichaNoFrontend(fichaId);
             }
         };
 

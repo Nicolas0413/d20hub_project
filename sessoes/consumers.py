@@ -105,6 +105,21 @@ class SalaConsumer(WebsocketConsumer):
                         'codigo_sala': codigo_sala
                     }
                 )
+        elif mensagem.startswith('/atualizar_editabilidade'):
+            parts = mensagem.split('/')
+            ficha_id = parts[2] if len(parts) > 2 else None
+            editabilidade = parts[3] if len(parts) > 3 else None
+            codigo_sala = parts[4] if len(parts) > 4 else None
+            if ficha_id and editabilidade and codigo_sala:
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'atualizar_editabilidade',
+                        'ficha_id': ficha_id,
+                        'editabilidade': editabilidade,
+                        'codigo_sala': codigo_sala
+                    }
+                )
         else:
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -141,5 +156,13 @@ class SalaConsumer(WebsocketConsumer):
             'type': 'atualizar_visibilidade',
             'ficha_id': event.get('ficha_id'),
             'visibilidade': event.get('visibilidade'),
+            'codigo_sala': event.get('codigo_sala')
+        }))
+
+    def atualizar_editabilidade(self, event):
+        self.send(text_data=json.dumps({
+            'type': 'atualizar_editabilidade',
+            'ficha_id': event.get('ficha_id'),
+            'editabilidade': event.get('editabilidade'),
             'codigo_sala': event.get('codigo_sala')
         }))

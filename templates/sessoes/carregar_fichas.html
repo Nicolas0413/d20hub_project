@@ -11,7 +11,7 @@
     <!--bootstrap javascript-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/sala_rpg.css' %}">
-    <script src="{% static 'js/sala_rpg.js' %}?v=9999.13" defer></script>
+    <script src="{% static 'js/sala_rpg.js' %}?v=9999.22" defer></script>
 </head>
 <body>
     <div class="accordion accordion-custom" id="fichasAccordion">
@@ -39,20 +39,41 @@
                                     </select>
                                 </form>
                             </p>
+                            <p>Editabilidade: 
+                                <form method="post" class="d-inline-block">
+                                    {% csrf_token %}
+                                    <select
+                                        data-id="{{ ficha.id }}"
+                                        class="form-select form-select-sm d-inline-block w-auto"
+                                        onclick="event.stopPropagation()"
+                                        mousedown="event.stopPropagation()"
+                                        onchange="alterarEditabilidade(this.dataset.id, this.value)"
+                                    >
+                                        <option value="3" {% if ficha.editabilidade == 3 %}selected{% endif %}>Pública</option>
+                                        <option value="2" {% if ficha.editabilidade == 2 %}selected{% endif %}>Sala</option>
+                                        <option value="1" {% if ficha.editabilidade == 1 %}selected{% endif %}>Mestre</option>
+                                        <option value="0" {% if ficha.editabilidade == 0 %}selected{% endif %}>Privada</option>
+                                    </select>
+                                </form>
+                            </p>
                         {% else %}
                             <p>Visibilidade: {{ ficha.get_visibilidade_display }}</p>
                         {% endif %}
                     </div>
                 </button>
             </h2>
-            <div id="ficha{{ ficha.id }}" class="accordion-collapse collapse" data-bs-parent="#fichasAccordion">
-                <div class="accordion-body">
-                    <p><a href="{% url 'fichas:ler' ficha_id=ficha.id categoria='ficha' %}" target="_blank">Visualizar</a></p>
-                    <button type="button" class="remove-item" data-item-id="{{ ficha.id }}">
-                        Retirar Ficha
-                    </button>
-                </div>
-            </div>
+                {% if pode_ver %}
+                    <div id="ficha{{ ficha.id }}" class="accordion-collapse collapse" data-bs-parent="#fichasAccordion">
+                        <div class="accordion-body">
+                            <p><a href="{% url 'fichas:ler' ficha_id=ficha.id categoria='ficha' %}" target="_blank">Visualizar</a></p>
+                            {% if request.user == ficha.usuario %}
+                                <button type="button" class="remove-item" data-item-id="{{ ficha.id }}">
+                                    Retirar Ficha
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
         </div>
     </div>
 </body>
