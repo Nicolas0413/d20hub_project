@@ -75,23 +75,27 @@
       </div> 
       <div class="accordion accordion-custom" id="accordionExample">
         {% for habilidade in ficha.habilidades.all %}
-          <table width="100%">
-            <td class="atk" width="111.68">
-              <input id="nome-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.nome }}" data-save="nome" data-habilidade-id="{{ habilidade.id }}">
-            </td>
-            <td class="atk" width="111.68">
-              <input id="custo-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.custo }}" data-save="custo" data-habilidade-id="{{ habilidade.id }}">
-            </td>
-            <td class="atk2" width="111.68">
-              <input id="pagina-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.pagina }}" data-save="pagina" data-habilidade-id="{{ habilidade.id }}">
-            </td>
-          </table>
-          <div id="{{ habilidade.id }}" class="accordion-collapse collapse">
-            <div class="accordion-body">
-              <textarea id="descricao-{{ habilidade.id }}" class="editable habilidade" disabled placeholder="Descrição da habilidade" data-save="descricao" data-habilidade-id="{{ habilidade.id }}">{{ habilidade.descricao }}</textarea>
-              <button class="remove-item" data-habilidade-id="{{ habilidade.id }}" onclick="remover('habilidade', '{{ habilidade.id }}')">Remover</button>
+        <div class="accordion accordion-custom" id="accordionHabilidades">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#habilidade{{ habilidade.id }}">
+                <div class="item-row" style="width:100%; display: flex; gap: 10px;">
+                  <input id="nome-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.nome }}" data-save="nome" data-habilidade-id="{{ habilidade.id }}">
+                  <input id="custo-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.custo }}" data-save="custo" data-habilidade-id="{{ habilidade.id }}">
+                  <input id="pagina-{{ habilidade.id }}" class="editable habilidade" disabled value="{{ habilidade.pagina }}" data-save="pagina" data-habilidade-id="{{ habilidade.id }}">
+                </div>
+              </button>
+            </h2>
+            <div id="habilidade{{ habilidade.id }}" class="accordion-collapse collapse" data-bs-parent="#accordionHabilidades">
+              <div class="accordion-body">
+                <textarea id="descricao-{{ habilidade.id }}" class="editable habilidade" disabled placeholder="Descrição da habilidade" data-save="descricao" data-habilidade-id="{{ habilidade.id }}">{{ habilidade.descricao }}</textarea>
+                <button class="remove-item" data-habilidade-id="{{ habilidade.id }}" onclick="remover('habilidade', '{{ habilidade.id }}')">
+                  Remover habilidade
+                </button>
+              </div>
             </div>
           </div>
+        </div>
         {% endfor %}
       </div>
     </div>
