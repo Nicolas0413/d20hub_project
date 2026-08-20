@@ -1,4 +1,53 @@
 var contador = 0;
+const boasVindas = document.getElementById("texto-boas-vindas");
+const nome = document.getElementById("nome-usuario");
+const final = document.getElementById("final");
+
+const usuario = nome.dataset.usuario;
+
+const texto = `Olá ${usuario}, Seja bem-vindo ao D20HUB.`;
+
+let i = 0;
+
+function digitar() {
+    if (i < texto.length) {
+
+        if (i < 4) {
+            boasVindas.textContent += texto[i];
+        } 
+        else if (i < 4 + usuario.length) {
+            nome.textContent += texto[i];
+        } 
+        else {
+            final.textContent += texto[i];
+        }
+
+        i++;
+
+        let velocidade = 40 + Math.random() * 60;
+
+        if (texto[i - 1] === " ") {
+            velocidade += 80;
+        }
+
+        if (".,!?:;".includes(texto[i - 1])) {
+            velocidade += 250;
+        }
+
+        setTimeout(digitar, velocidade);
+    }
+    else {
+        document.querySelector(".cursor").style.display = "none";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const elemento = document.getElementById("texto-boas-vindas");
+
+    if (elemento) {
+        digitar();
+    }
+});
 
 function criarDivFicha(id, nome) {
     const div = document.createElement("div");

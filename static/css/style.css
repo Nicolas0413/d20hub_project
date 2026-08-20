@@ -6,17 +6,12 @@ body {
 
 h2 {
     margin-left: 5vw;
-    display: inline-block;
-    font-size: 1.7vw;
+    display: block;
+    font-size: 1.5rem;
     margin-bottom: 10vh;
 }
 
-h2, button {
-    margin-top: 5vh;
-}
-
-button, a, a:visited {
-    margin-left: 5vw;
+button, .opcao a, .opcao a:visited {
     background-color: rgb(192, 33, 33);
     color: rgb(247, 237, 237);
     padding: 20px;
@@ -122,6 +117,9 @@ button:active {
 
 body {
     max-width: 100vw !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     margin: 0px;
     padding: 0px;
     overflow-x: hidden;
@@ -139,11 +137,15 @@ body {
 }
 
 .toolbar {
+    display: flex;
     background-color: rgb(17, 17, 17);
     width: 100vw;
-    height: 15vh;
+    height: 18vh;
     margin-bottom: 5vh;
+    justify-content: center;
+    align-items: center;
     box-shadow: 0 0px 10px 1px rgb(131, 21, 2);
+    text-shadow: 0 0 8px rgba(139, 0, 0, 0.8);
 }
 
 
@@ -156,24 +158,6 @@ button#apagar, button#enviar {
 input {
   margin-bottom: 20px;
   font-size: larger;
-
-}
-
-a {
-  margin-left: 0;
-  font-size: 15px;
-  text-decoration: none;
-  background-color: transparent;
-}
-
-a:hover {
-    cursor: pointer;
-    transform: translateY(-3px);
-    box-shadow: 0px 0px 5px 5px rgb(131, 21, 2);
-}
-
-a:active {
-    box-shadow: 0px 0px 5px 5px rgb(255, 38, 0) !important;
 }
 
 div.botoes {
@@ -196,6 +180,97 @@ label {
 h1 {
   display: block !important;
   text-align: center;
+  margin: 0;
+}
+
+.cursor {
+    animation: piscar 0.8s infinite;
+}
+
+@keyframes piscar {
+    50% {
+        opacity: 0;
+    }
+}
+
+#nome-usuario {
+    color: #d80909;
+    text-shadow: 0 0 8px rgba(139, 0, 0, 0.6);
+}
+
+#saudacao {
+    margin: 0;
+    display: block;
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 5vh;
+    font-size: 1.5rem;
+    text-shadow: 0 0 8px rgba(139, 0, 0, 0.4);
+}
+
+.icone {
+    width: 150px;
+    height: 150px;
+    display: block;
+    transition: all 0.25s ease;
+
+    background-color: rgb(17, 17, 17);
+
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: contain;
+
+    -webkit-mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+}
+
+
+.opcao a:hover .icone {
+    background-color: #8b0000;
+}
+
+#opcoes {
+    width: min(1000px, 90%);
+    margin: 60px auto;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 50px;
+}
+
+.opcao {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.opcao a {
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    text-decoration: none;
+    background-color: #1c1c1c;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.opcao a:hover {
+    background-color: #292929;
+    transform: translateY(-4px);
+}
+
+.opcao p {
+    margin-top: 15px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #eeeeee;
+    text-shadow: 0 0 8px rgba(139, 0, 0, 0.4);
 }
 
 .tudo {
@@ -220,6 +295,51 @@ input:hover {
     box-shadow: 0px 0px 5px 5px rgb(131, 21, 2);
 }
 
+.rodape {
+    margin-top: auto;
+    padding: 30px 20px;
+
+    border-top: 1px solid #292929;
+
+    text-align: center;
+
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.rodape p {
+    margin: 5px 0;
+}
+
+.creditos-site {
+    margin-bottom: 20px;
+}
+
+.creditos-site > p:first-child,
+.creditos-icones > p:first-child {
+    color: #aaa;
+    font-weight: bold;
+}
+
+.criadores {
+    color: #777;
+}
+
+.creditos-icones {
+    color: #666;
+}
+
+.creditos-icones a {
+    color: #8b0000;
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+}
+
+.creditos-icones a:hover {
+    color: #b30000;
+    text-decoration: underline;
+}
 
 /* Adições provisórias - Gama */
 
