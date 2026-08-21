@@ -14,3 +14,11 @@ class SignupForm(UserCreationForm):
             'password1',
             'password2'
         )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['username'].widget.attrs['placeholder'] = 'Digite seu nome de usuário'
+        self.fields['email'].widget.attrs['placeholder'] = 'Digite seu email'
+        self.fields['password1'].widget.attrs['placeholder'] = 'Digite sua senha'
+        self.fields['password2'].widget.attrs['placeholder'] = 'Confirme sua senha'

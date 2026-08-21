@@ -5,33 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Usuários</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.2">
     <script src="{% static 'js/scripts.js' %}" defer></script>
     <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
 </head>
 <body>
-    <fieldset>
+    <div class="toolbar">
+        <a href="{% url 'core:home' %}" id="retornar">Voltar ao Menu</a>
         <h1>Lista de Usuários</h1>
-
-        {% if usuarios %}
-            <table border="1" cellpadding="6" cellspacing="0">
-                <thead>
-                    <tr><th>ID</th><th>Username</th></tr>
-                </thead>
-                <tbody>
-                    {% for usuario in usuarios %}
-                        <tr>
-                            <td>{{ usuario.id }}</td>
-                            <td>{{ usuario.username }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>Nenhum usuário encontrado.</p>
-        {% endif %}
-
-        <p><a href="{% url 'core:home' %}">Voltar ao menu</a></p>
-    </fieldset>
+    </div>
+    {% if usuarios %}
+        <table class="tabela-usuarios">
+            <thead>
+                <tr>
+                    <th class="id">ID</th>
+                    <th>Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                    <tr>
+                        <td class="id">{{ usuario.id }}</td>
+                        <td>{{ usuario.username }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <table class="tabela-usuarios">
+            <thead>
+                <tr>
+                    <th class="id">ID</th>
+                    <th>Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                    <tr>
+                        <td class="id"></td>
+                        <td>Não há usuários cadastrados.</td>
+                    </tr>
+            </tbody>
+        </table>
+    {% endif %}
 </body>
 </html>

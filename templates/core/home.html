@@ -5,19 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <script src="{% static 'js/scripts.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.115">
+    <script src="{% static 'js/scripts.js' %}?v=1.13" defer></script>
     <link rel="icon" type="image/x-icon" href="{% static 'img/d20hub.ico' %}">
+    <style>
+        .sketchy_een {
+            fill: #000000;
+        }
+        .icone-license {
+            mask-image: url("{% static 'img/home-icones/license-svgrepo-com.svg' %}");
+            -webkit-mask-image: url("{% static 'img/home-icones/license-svgrepo-com.svg' %}");
+        }
+
+        .icone-create {
+            mask-image: url("{% static 'img/home-icones/create-svgrepo-com.svg' %}");
+            -webkit-mask-image: url("{% static 'img/home-icones/create-svgrepo-com.svg' %}");
+        }
+
+        .icone-extrude {
+            mask-image: url("{% static 'img/home-icones/extrude-svgrepo-com.svg' %}");
+            -webkit-mask-image: url("{% static 'img/home-icones/extrude-svgrepo-com.svg' %}");
+        }
+
+        .icone-discuss {
+            mask-image: url("{% static 'img/home-icones/discuss-svgrepo-com.svg' %}");
+            -webkit-mask-image: url("{% static 'img/home-icones/discuss-svgrepo-com.svg' %}");
+        }
+
+        .icone-end {
+            mask-image: url("{% static 'img/home-icones/end-svgrepo-com.svg' %}?v=1.1");
+            -webkit-mask-image: url("{% static 'img/home-icones/end-svgrepo-com.svg' %}?v=1.1");
+        }
+    </style>
 </head>
 <body>
-    <h1>Menu</h1>
-    <p>Olá, {{ usuario }}! Seja bem vindo.</p>
-    <fieldset>
-        <p><a href="{% url 'core:listar_usuarios' %}">Ver usuários cadastrados</a></p>
-        <p><a href="{% url 'fichas:home' %}" target="_blank">Abrir Fichas</a></p>
-        <p><a href="{% url 'sessoes:criar_sala' %}">Criar sala</a></p>
-        <p><a href="{% url 'sessoes:entrar_sala' %}">Entrar em uma sala</a></p>
-        <p><a href="{% url 'contas:logout' %}">Sair</a></p>
-    </fieldset>
+    <div class="toolbar">
+        <h1>Menu Principal</h1>
+    </div>
+    <h2 id="saudacao">
+        <span id="texto-boas-vindas"></span><span id="nome-usuario" data-usuario="{{ usuario }}"></span><span id="final"></span><span class="cursor">|</span>
+    </h2>
+    <div id="opcoes">
+        <div class="opcao">
+            <a href="{% url 'fichas:home' %}">
+                <span class="icone icone-create"></span>
+            </a>
+            <p>Abrir Fichas</p>
+        </div>
+        <div class="opcao">
+            <a href="{% url 'sessoes:criar_sala' %}">
+                <span class="icone icone-extrude"></span>
+            </a>
+            <p>Criar sala</p>
+        </div>
+        <div class="opcao">
+            <a href="{% url 'sessoes:entrar_sala' %}">
+                <span class="icone icone-discuss"></span>
+            </a>
+            <p>Entrar em Sala</p>
+        </div>
+        <div class="opcao">
+            <a href="{% url 'core:listar_usuarios' %}">
+                <span class="icone icone-license"></span>
+            </a>
+            <p>Ver usuários cadastrados</p>
+        </div>
+        <div class="opcao">
+            <a href="{% url 'contas:logout' %}">
+                <span class="icone icone-end"></span>
+            </a>
+            <p>Sair</p>
+        </div>
+    </div>
+    <footer class="rodape">
+        <div class="creditos-site">
+            <p>Desenvolvido por</p>
+            <p class="criadores">
+                Henrique Gama Pereira · Eduardo Schuquel Mattioni · Nicolas Silveira Teixeira
+            </p>
+        </div>
+
+        <div class="creditos-icones">
+            <p>Ícones utilizados</p>
+            <p>
+                Ícones por Shannon E. Thomas, disponibilizados pelo
+                <a href="https://www.svgrepo.com/" target="_blank" rel="noopener noreferrer">
+                    SVG Repo
+                </a>
+                sob licença CC Attribution.
+            </p>
+        </div>
+    </footer>
 </body>
 </html>
