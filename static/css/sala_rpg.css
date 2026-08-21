@@ -155,10 +155,18 @@ button:not(.accordion-button),a {
   cursor: pointer;
 }
 
-button:not(.accordion-button):hover,a:hover { background: rgb(247,40,40); scale: 1.01; box-shadow: 0 0 10px 5px rgba(131,21,2,0.5); }
+
+button:not(.accordion-button):hover,a:hover { background: rgb(247,40,40); box-shadow: 0 0 10px 5px rgba(131,21,2,0.5); }
 button:not(.accordion-button):active,a:active { opacity: 0.8; box-shadow: 0 0 5px 2px rgba(255,38,0,0.5); }
 
-#retornar,#entrar-sala { display: inline-block; font-size: 14px; padding: 5px 10px; margin: 10px 0 0 4px; }
+#entrar-sala { display: inline-block; font-size: 14px; padding: 5px 10px; margin: 10px 0 0 4px; }
+
+#retornar {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+}
 
 input {
   background: #363636;
@@ -172,6 +180,9 @@ input {
 
 /* Toolbar */
 .toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgb(17,17,17);
   width: 100%;
   height: 18vh;

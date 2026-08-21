@@ -47,13 +47,7 @@
     </h2>
     <div id="opcoes">
         <div class="opcao">
-            <a href="{% url 'core:listar_usuarios' %}" target="_blank">
-                <span class="icone icone-license"></span>
-            </a>
-            <p>Ver usuários cadastrados</p>
-        </div>
-        <div class="opcao">
-            <a href="{% url 'fichas:home' %}" target="_blank">
+            <a href="{% url 'fichas:home' %}">
                 <span class="icone icone-create"></span>
             </a>
             <p>Abrir Fichas</p>
@@ -69,6 +63,12 @@
                 <span class="icone icone-discuss"></span>
             </a>
             <p>Entrar em Sala</p>
+        </div>
+        <div class="opcao">
+            <a href="{% url 'core:listar_usuarios' %}">
+                <span class="icone icone-license"></span>
+            </a>
+            <p>Ver usuários cadastrados</p>
         </div>
         <div class="opcao">
             <a href="{% url 'contas:logout' %}">
