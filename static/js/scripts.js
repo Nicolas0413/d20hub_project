@@ -1,44 +1,49 @@
 var contador = 0;
-const boasVindas = document.getElementById("texto-boas-vindas");
 const nome = document.getElementById("nome-usuario");
-const final = document.getElementById("final");
 
-const usuario = nome.dataset.usuario;
+if (nome) {
+    const boasVindas = document.getElementById("texto-boas-vindas");
+    const final = document.getElementById("final");
+    const usuario = nome.dataset.usuario;
+    const texto = `Olá ${usuario}, Seja bem-vindo ao D20HUB.`;
+    let i = 0;
+    function digitar() {
+        if (i < texto.length) {
+            if (i < 4) {
+                boasVindas.textContent += texto[i];
 
-const texto = `Olá ${usuario}, Seja bem-vindo ao D20HUB.`;
+            } else if (i < 4 + usuario.length) {
+                nome.textContent += texto[i];
 
-let i = 0;
+            } else {
+                final.textContent += texto[i];
+            }
 
-function digitar() {
-    if (i < texto.length) {
+            i++;
 
-        if (i < 4) {
-            boasVindas.textContent += texto[i];
-        } 
-        else if (i < 4 + usuario.length) {
-            nome.textContent += texto[i];
-        } 
-        else {
-            final.textContent += texto[i];
+            let velocidade = 40 + Math.random() * 60;
+
+            if (texto[i - 1] === " ") {
+                velocidade += 80;
+            }
+
+            if (".,!?:;".includes(texto[i - 1])) {
+                velocidade += 250;
+            }
+
+            setTimeout(digitar, velocidade);
+        } else {
+            const cursor = document.querySelector(".cursor");
+
+            if (cursor) {
+                cursor.style.display = "none";
+            }
         }
-
-        i++;
-
-        let velocidade = 40 + Math.random() * 60;
-
-        if (texto[i - 1] === " ") {
-            velocidade += 80;
-        }
-
-        if (".,!?:;".includes(texto[i - 1])) {
-            velocidade += 250;
-        }
-
-        setTimeout(digitar, velocidade);
     }
-    else {
-        document.querySelector(".cursor").style.display = "none";
-    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        digitar();
+    });
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -77,7 +82,10 @@ function criarDivFicha(id, nome) {
         .then(res => res.json())
         .then(data => {
             if (data.status !== true) {
-                alert("Erro ao salvar o nome da ficha! Tente novamente.");
+                mostrarMensagem(
+                    "Erro",
+                    "Erro ao salvar o nome da ficha! Tente novamente."
+                );
             }
         });
     });
@@ -96,7 +104,10 @@ function criarDivFicha(id, nome) {
         if (nomeAtual) {
             window.location.href = `/fichas/${id}/ficha/`;
         } else {
-                alert("Por favor, digite um nome para a ficha.");
+                mostrarMensagem(
+                    "Nome inválido",
+                    "Por favor, digite um nome para a ficha."
+                );
             }
     });
         
@@ -106,24 +117,36 @@ function criarDivFicha(id, nome) {
     botoesDiv.appendChild(excluirBtn);
 
     excluirBtn.addEventListener("click", () => {
-        if (confirm("Tem certeza que deseja excluir esta ficha?")) {
-        fetch(`/fichas/${id}/ficha/excluir/`, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": window.csrftoken
+
+        confirmarAcao(
+            "Excluir ficha",
+            "Tem certeza que deseja excluir esta ficha?",
+            () => {
+
+                fetch(`/fichas/${id}/ficha/excluir/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": window.csrftoken
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data.status === true) {
+                        fichasContainer.removeChild(div);
+                        contador--;
+                        document.getElementById("contadorFichas").textContent =
+                            `Fichas: ${contador}/15`;
+                    } else {
+                        mostrarMensagem(
+                            "Erro",
+                            "Erro ao excluir ficha! Tente novamente."
+                        );
+                    }
+                });
             }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === true) {
-                fichasContainer.removeChild(div); 
-                contador--; 
-                document.getElementById("contadorFichas").textContent = `Fichas: ${contador}/15`;
-            } else {
-                alert("Erro ao excluir ficha! Tente novamente.");
-            }
-        });
-    }});
+        );
+    });
 }
 
 function carregarFichas() {
@@ -144,12 +167,14 @@ function carregarFichas() {
     });
 }
 
-if (document.getElementById("fichasContainer")) { /* se página for home.html */
+if (document.getElementById("fichasContainer")) {
     carregarFichas();
-
     document.getElementById("criarFicha").addEventListener("click", () => {
         if (contador >= 15) {
-            alert("Limite de fichas atingido!");
+            mostrarMensagem(
+                "Limite atingido",
+                "Você já possui o número máximo de 15 fichas."
+            );
             return;
         }
         fetch("/fichas/criar/", {
@@ -165,31 +190,89 @@ if (document.getElementById("fichasContainer")) { /* se página for home.html */
                 contador++;
                 document.getElementById("contadorFichas").textContent = `Fichas: ${contador}/15`;
             } else {
-                alert("Erro ao criar ficha! Tente novamente.");
+                mostrarMensagem(
+                    "Erro",
+                    "Não foi possível criar a ficha. Tente novamente."
+                );
             }
         });
     });
 
     document.getElementById("limparFichas").addEventListener("click", () => {
-        if (confirm("Tem certeza que deseja excluir todas as fichas?")) {
-            fetch("/fichas/limpar/", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": csrftoken
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === true) {
-                    while (fichasContainer.firstChild) {
-                        fichasContainer.removeChild(fichasContainer.firstChild);
+        confirmarAcao(
+            "Limpar fichas",
+            "Tem certeza que deseja excluir todas as suas fichas?",
+            () => {
+                fetch("/fichas/limpar/", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrftoken
                     }
-                    contador = 0;
-                    document.getElementById("contadorFichas").textContent = `Fichas: ${contador}/15`;
-                } else {
-                    alert("Erro ao limpar fichas! Tente novamente.");
-                }
-            });
-        }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === true) {
+                        while (fichasContainer.firstChild) {fichasContainer.removeChild(fichasContainer.firstChild);}
+                        contador = 0;
+                        document.getElementById("contadorFichas").textContent = `Fichas: ${contador}/15`;
+                    } else {
+
+                        mostrarMensagem(
+                            "Erro",
+                            "Não foi possível limpar as fichas. Tente novamente."
+                        );
+                    }
+                });
+            }
+        );
     });
+}
+
+function mostrarMensagem(titulo, mensagem) {
+    const modal = document.getElementById("mensagemModal");
+
+    document.getElementById("mensagemModalTitulo").textContent = titulo;
+    document.getElementById("mensagemModalTexto").textContent = mensagem;
+    document.getElementById("mensagemModalCancelar").style.display = "none";
+    document.getElementById("mensagemModalConfirmar").textContent = "OK";
+    document.getElementById("mensagemModalConfirmar").style.display = "block";
+
+    modal.style.display = "flex";
+
+    document.getElementById("mensagemModalConfirmar").onclick = () => {
+        modal.style.display = "none";
+    };
+
+    document.getElementById("mensagemModalFechar").onclick = () => {
+        modal.style.display = "none";
+    };
+}
+
+function confirmarAcao(titulo, mensagem, callback) {
+    const modal = document.getElementById("mensagemModal");
+
+    document.getElementById("mensagemModalTitulo").textContent = titulo;
+    document.getElementById("mensagemModalTexto").textContent = mensagem;
+
+    const cancelar = document.getElementById("mensagemModalCancelar");
+    const confirmar = document.getElementById("mensagemModalConfirmar");
+    const fechar = document.getElementById("mensagemModalFechar");
+
+    cancelar.style.display = "block";
+    confirmar.style.display = "block";
+
+    modal.style.display = "flex";
+
+    confirmar.onclick = () => {
+        modal.style.display = "none";
+        callback();
+    };
+
+    cancelar.onclick = () => {
+        modal.style.display = "none";
+    };
+
+    fechar.onclick = () => {
+        modal.style.display = "none";
+    };
 }

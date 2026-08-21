@@ -23,6 +23,9 @@ body {
     z-index: 1001;
  }
 
+#retornar:hover { background: rgb(247,40,40); box-shadow: 0 0 10px 5px rgba(131,21,2,0.5); }
+#retornar:active { opacity: 0.8; box-shadow: 0 0 5px 2px rgba(255,38,0,0.5); }
+
  .tabela-usuarios {
     width: 100%;
     max-width: 500px;
@@ -74,9 +77,6 @@ td.id {
 .tabela-usuarios tbody tr:last-child td {
     border-bottom: none;
 }
-
-#retornar:hover { background: rgb(247,40,40); box-shadow: 0 0 10px 5px rgba(131,21,2,0.5); }
-#retornar:active { opacity: 0.8; box-shadow: 0 0 5px 2px rgba(255,38,0,0.5); }
 
 .opcao a, .opcao a:visited {
     background-color: rgb(192, 33, 33);
