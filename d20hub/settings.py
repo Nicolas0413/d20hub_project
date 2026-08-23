@@ -40,14 +40,14 @@ CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
 INSTALLED_APPS = [
     'daphne',
     'channels',
-    'cloudinary',
-    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
     'core',
     'contas',
     'fichas',
@@ -142,6 +142,8 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Configuração de login
 
