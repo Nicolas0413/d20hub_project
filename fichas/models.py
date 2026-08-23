@@ -7,7 +7,7 @@ class Ficha(models.Model):
     editabilidade = models.IntegerField(choices=[(0, 'Privada'), (1, 'Mestre'), (2, 'Sala'), (3, 'Pública')], default=0)
     nome = models.CharField(max_length=64, default="")
     personagem = models.CharField(max_length=64, default="Nome do personagem")
-    foto_personagem = models.ImageField(upload_to='fotos_fichas/', default="fotos_fichas/personagem_padrao.jpg")
+    foto_personagem = models.ImageField(upload_to='fichas/foto_personagem/', default='foto_personagem/personagem')
     nex = models.IntegerField(null=True, blank=True, default=40)
     classe = models.CharField(max_length=32, default="Combatente")
     trilha = models.CharField(max_length=32, default="Aniquilador")
@@ -16,7 +16,7 @@ class Ficha(models.Model):
     anotacoes = models.TextField(default="Anotações gerais sobre o personagem e missões")
     aparencia = models.TextField(default="Descrição física do personagem como: gênero, idade, altura etc.")
     historia = models.TextField(default="História do personagem (de onde veio, qual seu objetivo etc.)")
-    token_personagem = models.ImageField(upload_to='token_personagens/', default="token_personagens/token_padrao.png")
+    token_personagem = models.ImageField(upload_to='fichas/token_personagem/', default='token_personagem/token')
 
     def __str__(self):
         return self.nome
