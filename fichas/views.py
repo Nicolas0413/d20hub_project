@@ -124,9 +124,20 @@ def fichas_usuario_view(request):
     return JsonResponse(vetor_fichas, safe=False, status=200)
 
 @login_required
+@login_required
 def criar_ficha_view(request):
     if request.method == 'POST':
-        ficha = Ficha.objects.create(usuario = request.user, nome="")
+        sistema = "ordem_paranormal"
+        if request.body:
+            try:
+                dados = json.loads(request.body)
+                sistema_recebido = dados.get("sistema")
+                if sistema_recebido in dict(Ficha.SISTEMA_CHOICES):
+                    sistema = sistema_recebido
+            except json.JSONDecodeError:
+                pass
+
+        ficha = Ficha.objects.create(usuario=request.user, nome="", sistema=sistema)
         Estatisticas.objects.create(ficha=ficha)
         Inventario.objects.create(ficha=ficha)
         return JsonResponse({"id": ficha.id, "nome": ficha.nome, "status": True})
@@ -165,6 +176,9 @@ def ler_view(request, ficha_id, categoria):
             {"status": False, "mensagem": "Não encontrada"},
             status=404
         )
+
+    if categoria == "ficha" and ficha.sistema == "tormenta20":
+        pagina = "ficha_T20.html"
 
     url = 'fichas/' + pagina
 

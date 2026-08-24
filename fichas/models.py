@@ -2,7 +2,14 @@ from django.db import models
 from django.conf import settings
 
 class Ficha(models.Model):
+    SISTEMA_CHOICES = [
+        ('ordem_paranormal', 'Ordem Paranormal'),
+        ('tormenta', 'Tormenta'),
+        ('tormenta20', 'Tormenta 20'),
+    ]
+
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="fichas")
+    sistema = models.CharField(max_length=32, choices=SISTEMA_CHOICES, default='ordem_paranormal')
     visibilidade = models.IntegerField(choices=[(0, 'Privada'), (1, 'Mestre'), (2, 'Sala'), (3, 'Pública')], default=0)
     editabilidade = models.IntegerField(choices=[(0, 'Privada'), (1, 'Mestre'), (2, 'Sala'), (3, 'Pública')], default=0)
     nome = models.CharField(max_length=64, default="")
@@ -94,5 +101,6 @@ class Item(models.Model):
     def __str__(self):
         return self.nome
 
-    
+
+
     

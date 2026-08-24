@@ -149,3 +149,90 @@ body {
 h2 {
     float: left;
 }
+
+/* Modal de seleção de sistema */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 420px;
+    background: #141414;
+    color: white;
+    border: 1px solid rgb(192, 33, 33);
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(131, 21, 2, 0.6);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: #111;
+    border-bottom: 1px solid rgb(192, 33, 33);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.close-modal {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    color: white;
+    background: none;
+    border: none;
+    box-shadow: none;
+    font-size: 26px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: rgb(247, 40, 40);
+    background: none;
+    box-shadow: none;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.ficha-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ficha-item {
+    padding: 14px 16px;
+    background: #1f1f1f;
+    color: white;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.ficha-item:hover {
+    background: rgb(192, 33, 33);
+    border-color: rgb(192, 33, 33);
+    box-shadow: 0 0 10px rgba(131, 21, 2, 0.7);
+    transform: translateY(-1px);
+}
+
+.ficha-nome {
+    font-weight: bold;
+    font-size: 16px;
+}

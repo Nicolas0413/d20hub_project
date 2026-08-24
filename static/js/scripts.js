@@ -103,31 +103,14 @@ if (document.getElementById("fichasContainer")) { /* se página for home.html */
             alert("Limite de fichas atingido!");
             return;
         }
-        fetch("/fichas/criar/", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrftoken
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === true) {
-                criarDivFicha(data.id, data.nome);
-                contador++;
-                document.getElementById("contadorFichas").textContent = `Fichas: ${contador}/15`;
-            } else {
-                alert("Erro ao criar ficha! Tente novamente.");
-            }
-        });
+        abrirModalSistema();
     });
 
     document.getElementById("limparFichas").addEventListener("click", () => {
         if (confirm("Tem certeza que deseja excluir todas as fichas?")) {
             fetch("/fichas/limpar/", {
                 method: "POST",
-                headers: {
-                    "X-CSRFToken": csrftoken
-                }
+                headers: { "X-CSRFToken": csrftoken }
             })
             .then(res => res.json())
             .then(data => {
@@ -141,6 +124,67 @@ if (document.getElementById("fichasContainer")) { /* se página for home.html */
                     alert("Erro ao limpar fichas! Tente novamente.");
                 }
             });
+        }
+    });
+}
+
+function abrirModalSistema() {
+    const overlay = document.createElement("div");
+    overlay.classList.add("modal-overlay");
+    overlay.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Escolha o sistema</h2>
+                <button class="close-modal" id="fecharModalSistema">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ficha-list">
+                    <div class="ficha-item" data-sistema="ordem_paranormal">
+                        <div class="ficha-nome">Ordem Paranormal</div>
+                    </div>
+                    <div class="ficha-item" data-sistema="tormenta">
+                        <div class="ficha-nome">Tormenta</div>
+                    </div>
+                    <div class="ficha-item" data-sistema="tormenta20">
+                        <div class="ficha-nome">Tormenta 20</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector("#fecharModalSistema").addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", (evento) => {
+        if (evento.target === overlay) overlay.remove();
+    });
+
+    overlay.querySelectorAll(".ficha-item").forEach(item => {
+        item.addEventListener("click", () => {
+            const sistema = item.dataset.sistema;
+            overlay.remove();
+            criarFichaComSistema(sistema);
+        });
+    });
+}
+
+function criarFichaComSistema(sistema) {
+    fetch("/fichas/criar/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken
+        },
+        body: JSON.stringify({ sistema: sistema })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === true) {
+            criarDivFicha(data.id, data.nome);
+            contador++;
+            document.getElementById("contadorFichas").textContent = `Fichas: ${contador}/15`;
+        } else {
+            alert("Erro ao criar ficha! Tente novamente.");
         }
     });
 }

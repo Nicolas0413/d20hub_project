@@ -592,3 +592,7 @@ textarea {
 .estilo:active {
   opacity: 0.6;
 }
+
+.attributes.attributes-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
