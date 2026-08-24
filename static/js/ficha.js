@@ -43,7 +43,10 @@ document.addEventListener("change", evento =>{
 const foto = document.getElementById("charImage"); 
 const inputFoto = document.getElementById("imageInput");
 foto.addEventListener("click", () => {
-    inputFoto.click();
+    if (window.edit) {
+        inputFoto.click();
+    }
+    
 });
 
 if (document.getElementById("detailImage")) { /* se página for detalhes.html */
