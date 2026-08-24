@@ -27,6 +27,211 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
+  background: rgba(192, 33, 33, 0.9) !important;
+  border-bottom: 1px solid rgb(192, 33, 33);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.ficha-acoes {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-ficha {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 14px !important;
+    border-radius: 7px !important;
+    font-size: 14px !important;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
+}
+
+.btn-ficha:hover {
+    transform: translateY(-1px);
+}
+
+.btn-ficha:active {
+    transform: translateY(0);
+}
+
+.btn-visualizar {
+    background-color: #343a40;
+    color: #fff;
+    border-color: #495057;
+    box-shadow: 0 0 10px #495057;
+}
+
+.btn-visualizar:hover {
+    background-color: #495057;
+    color: #fff;
+}
+
+.btn-retirar {
+    background-color: transparent;
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-retirar:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.btn-adicionar-ficha {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px !important;
+    padding: 10px 18px !important;
+    margin-bottom: 15px !important;
+    border: 1px solid #495057 !important;
+    border-radius: 7px !important;
+    background-color: #343a40 !important;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1) !important;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.btn-adicionar-ficha:hover {
+    background-color: #495057 !important;
+    border-color: #6c757d !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.btn-adicionar-ficha:active {
+    transform: translateY(0) !important;
+    box-shadow: none !important;
+}
+
+.btn-adicionar-ficha i {
+    font-size: 16px !important;
+}
+
+.close-modal {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  color: white;
+  background: none;
+  border: none;
+  box-shadow: none;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: rgb(247, 40, 40);
+  background: none;
+  box-shadow: none;
+  transform: scale(1.15);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.overlay-jogadores {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.65);
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    z-index: 2000;
+}
+
+.jogadores-modal .tabela-usuarios {
+    margin: 0;
+}
+
+.ficha-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ficha-item {
+  padding: 14px 16px;
+  background: #1f1f1f;
+  color: white;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.ficha-item:hover {
+  background: rgb(192, 33, 33);
+  border-color: rgb(192, 33, 33);
+  box-shadow: 0 0 10px rgba(131, 21, 2, 0.7);
+  transform: translateY(-1px);
+}
+
+.ficha-nome {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #141414;
+  color: white;
+  border: 1px solid rgb(192, 33, 33);
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(131, 21, 2, 0.6);
+  font-family: 'Courier New', Courier, monospace;
+  scrollbar-color: #831502 #0a0a0a;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
   background: #111;
   border-bottom: 1px solid rgb(192, 33, 33);
 }
@@ -61,39 +266,55 @@
   padding: 20px;
 }
 
-.ficha-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.modal-botoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px !important;
+    margin-top: 20px !important;
 }
 
-.ficha-item {
-  padding: 14px 16px;
-  background: #1f1f1f;
-  color: white;
-  border: 1px solid #3a3a3a;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
+.overlay-selecionar-ficha {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
 }
 
-.ficha-item:hover {
-  background: rgb(192, 33, 33);
-  border-color: rgb(192, 33, 33);
-  box-shadow: 0 0 10px rgba(131, 21, 2, 0.7);
-  transform: translateY(-1px);
+.overlay-selecionar-ficha .modal-content {
+    background: rgba(0, 0, 0, 0.75);
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 400px;
 }
 
-.ficha-nome {
-  font-weight: bold;
-  font-size: 16px;
+.modal-botoes button {
+    padding: 7px 15px !important;
+    font-size: 14px !important;
+    border-radius: 5px !important;
 }
 
-.modal-body p {
-  margin: 0;
-  text-align: center;
-  color: #999;
-  font-style: italic;
+#mensagemModalCancelar {
+    background: #333;
+    box-shadow: none;
+}
+
+#mensagemModalCancelar:hover {
+    background: #444;
+}
+
+#mensagemModalConfirmar {
+    background: rgb(192, 33, 33);
+}
+
+#mensagemModalTexto {
+    margin: 0;
+    text-align: left;
+    color: #ddd;
 }
 
 .carregar-ficha {
@@ -275,6 +496,7 @@ input::placeholder {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  justify-content: flex-end;
   scrollbar-width: thin;
   scrollbar-color: #831502 #0a0a0a;
 }
@@ -308,4 +530,188 @@ input::placeholder {
 
 #mensagens::-webkit-scrollbar-thumb:hover {
     background: rgb(192, 33, 33);
+}
+
+#botao-jogadores {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+    margin: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    cursor: pointer;
+    z-index: 10;
+}
+
+ .tabela-usuarios {
+    width: 100%;
+    width: 500px;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: #141414;
+    color: white;
+    font-family: 'Franklin Gothic Medium', Courier, monospace;
+    box-shadow: 0 0 10px 1px rgba(131, 21, 2, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    text-shadow: 0 0 8px rgba(139, 0, 0, 0.4);
+}
+
+.id {
+    text-align: center !important;
+}
+
+.role-mestre {
+    color: rgb(192, 33, 33);
+    font-weight: bold;
+}
+
+td.id {
+    color: rgb(192, 33, 33);
+}
+
+.tabela-usuarios thead {
+    background: rgb(192, 33, 33);
+}
+
+.tabela-usuarios th {
+    padding: 10px 25px;
+    font-weight: bold;
+    border-bottom: 1px solid #831502;
+}
+
+.tabela-usuarios th:nth-child(2),
+.tabela-usuarios td:nth-child(2) {
+    padding-right: 0px;
+}
+
+.tabela-usuarios td {
+    padding: 10px 25px;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.tabela-usuarios tbody tr {
+    transition: all 0.2s ease;
+}
+
+.tabela-usuarios tbody tr:hover {
+    background: #2a2a2a;
+    box-shadow: inset 3px 0 0 rgb(192, 33, 33);
+    cursor: pointer;
+}
+
+.tabela-usuarios tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.icone-jogadores {
+    width: 60px;
+    height: 60px;
+    display: block;
+    filter: brightness(0) invert(1);
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.menu-jogador {
+    position: fixed;
+    z-index: 9999;
+
+    background: #141414;
+    border: 1px solid rgb(192, 33, 33);
+    border-radius: 8px;
+
+    box-shadow: 0 0 15px rgba(131, 21, 2, 0.6);
+
+    overflow: hidden;
+}
+
+.opcoes-jogador {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    min-width: 170px;
+}
+
+.opcoes-jogador li {
+    padding: 10px 15px;
+
+    color: white;
+
+    font-family: 'Franklin Gothic Medium',
+                 'Arial Narrow',
+                 Arial,
+                 sans-serif;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.opcoes-jogador li:hover {
+    background: rgb(192, 33, 33);
+    opacity: 0.9;
+}
+
+.opcoes-jogador li:active {
+    opacity: 0.4;
+}
+
+#botao-jogadores:hover .icone-jogadores {
+    transform: scale(1.15);
+    filter:
+        brightness(0)
+        saturate(100%)
+        invert(15%)
+        sepia(90%)
+        saturate(4000%)
+        hue-rotate(350deg);
+}
+
+@media (max-width: 740px) {
+    .toolbar {
+        height: auto;
+        min-height: 18vh;
+        padding: 30px 80px;
+        box-sizing: border-box;
+    }
+
+    .toolbar h1 {
+        font-size: 1.6rem;
+        line-height: 1.2;
+    }
+
+    #retornar {
+        top: 15px;
+        left: 15px;
+        font-size: 16px;
+        padding: 6px 14px;
+    }
+}
+
+@media (max-width: 560px) {
+    .toolbar {
+        padding: 60px 20px 25px;
+    }
+
+    .toolbar h1 {
+        font-size: 1.4rem;
+    }
+
+    #retornar {
+        top: 12px;
+        left: 12px;
+    }
 }

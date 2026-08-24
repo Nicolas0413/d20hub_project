@@ -11,25 +11,38 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <!--bootstrap javascript-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="{% static 'css/sala_rpg.css' %}?v=1.2">
+    <link rel="stylesheet" href="{% static 'css/sala_rpg.css' %}?v=1.27">
     <script>
         const selecionarFichaUrl = "{% url 'sessoes:selecionar_ficha' %}";
+        const jogadoresSalaUrl = "{% url 'sessoes:jogadores_sala' %}";
         window.csrftoken = '{{ csrf_token }}';
+        window.usuarioAtualId = {{ request.user.id }};
+        window.mestreId = {{ sala.mestre.id }};
     </script>
-    <script src="{% static 'js/sala_rpg.js' %}?v=9999.22" defer></script>
+    <script src="{% static 'js/sala_rpg.js' %}?v=9999.29" defer></script>
     <title>Sala</title>
 </head>
 <body>
     <div class="toolbar">
-        <a href="{% url 'core:home' %}" id="retornar">Voltar ao Menu</a>
+        <a href="{% url 'core:home' %}" id="retornar"><i class="bi bi-arrow-left"></i> Voltar ao Menu</a>
         <h1>Mesa de RPG: {{ sala.codigo }}</h1>
     </div>
     <input type="hidden" id="codigo-sala" value="{{ sala.codigo }}">
     <div id="conteudo">
         <div id="fichas">
-            <button type="button" class="edit-btn" onclick="adicionarFicha()">Adicionar Ficha</button>
+            <button type="button" class="btn-adicionar-ficha" onclick="adicionarFicha()">
+                <i class="bi bi-plus-lg"></i>
+                Adicionar Ficha
+            </button>
         </div>
         <div id="chat">
+            <button onclick="verJogadores()" id="botao-jogadores" type="button">
+                <img
+                    src="{% static 'img/home-icones/license-svgrepo-com.svg' %}"
+                    class="icone-jogadores"
+                    alt="Jogadores"
+                >
+            </button>
             <div id="mensagens"></div>
             <form id="form" autocomplete="off">
                 <input type="text" name="mensagem" id="mensagem" placeholder="Digite sua mensagem...">
@@ -44,5 +57,21 @@
             {% endfor %}
         ];
     </script>
+    <div id="mensagemModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="mensagemModalTitulo">Mensagem</h2>
+            </div>
+
+            <div class="modal-body">
+                <p id="mensagemModalTexto"></p>
+
+                <div id="mensagemModalBotoes" class="modal-botoes">
+                    <button id="mensagemModalCancelar">Cancelar</button>
+                    <button id="mensagemModalConfirmar">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

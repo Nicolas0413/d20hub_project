@@ -13,7 +13,7 @@ function adicionarFicha() {
         .then(response => response.text())
         .then(html => {
             const modal = document.createElement('div');
-            modal.classList.add('modal-overlay');
+            modal.classList.add('overlay-selecionar-ficha');
             modal.innerHTML = html;
 
             document.body.appendChild(modal);
@@ -108,7 +108,13 @@ function atualizarFichaNoFrontend(fichaId) {
         .then(html => {
             fichaDiv.innerHTML = html;
             fichaDiv.dataset.fichaId = fichaId;
+            const ficha = fichaDiv.querySelector('[data-visibilidade]');
+
+            if (ficha) {
+                fichaDiv.dataset.visibilidade = ficha.dataset.visibilidade;
+            }
             configurarRemocaoFicha(fichaDiv);
+
         })
         .catch(error => {
             console.error('Erro ao atualizar ficha:', error);
@@ -231,9 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function adicionarMensagem(texto) {
         if (!mensagens) return;
+
         const p = document.createElement('p');
         p.textContent = texto;
+
         mensagens.appendChild(p);
+
+        mensagens.scrollTop = mensagens.scrollHeight;
     }
 
     if (form) {
@@ -287,7 +297,20 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (data.type === 'atualizar_visibilidade' || data.type === 'atualizar_editabilidade') {
                 const fichaId = data.ficha_id ?? data.ficha;
                 if (fichaId) atualizarFichaNoFrontend(fichaId);
-            }
+            } else if (data.type === 'mestre_atualizado') {
+                window.mestreId = Number(data.mestre_id);
+                atualizarJogadores();
+            } else if (data.type === 'voce_foi_expulso') {
+                mostrarModalExpulsao(data.mensagem);
+                return;
+            }  else if (data.type === 'jogador_expulso') {
+                    atualizarJogadores();
+                    if (Array.isArray(data.fichas)) {
+                        data.fichas.forEach(fichaId => {
+                            removerFichaNoFrontend(fichaId);
+                        });
+                    }
+                }
         };
 
         socket.onclose = function() {
@@ -305,4 +328,244 @@ document.addEventListener('DOMContentLoaded', () => {
     fichasParaCarregar.forEach(fichaId => {
         if (fichaId) carregarFicha(fichaId);
     });
+});
+
+function verJogadores() {
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+
+    if (!codigoSala) return;
+
+    // Impede abrir outra se já estiver aberta
+    if (document.getElementById('overlay-jogadores')) {
+        return;
+    }
+
+    fetch(`/sessoes/jogadores-sala/?codigo_sala=${encodeURIComponent(codigoSala)}`)
+        .then(response => response.text())
+        .then(html => {
+
+            const overlay = document.createElement('div');
+            overlay.id = 'overlay-jogadores';
+            overlay.className = 'overlay-jogadores';
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-jogadores';
+
+            modal.innerHTML = html;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            overlay.addEventListener('click', function(event) {
+                if (event.target === overlay) {
+                    overlay.remove();
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar jogadores:', error);
+        });
+}
+
+function atualizarJogadores() {
+
+    const overlay = document.getElementById('overlay-jogadores');
+
+    if (!overlay) {
+        return;
+    }
+
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+
+    fetch(`/sessoes/jogadores-sala/?codigo_sala=${encodeURIComponent(codigoSala)}`)
+        .then(response => response.text())
+        .then(html => {
+
+            const modal = overlay.querySelector('.modal-jogadores');
+
+            if (modal) {
+                modal.innerHTML = html;
+            }
+
+        })
+        .catch(error => {
+            console.error('Erro ao atualizar jogadores:', error);
+        });
+}
+
+let menuJogadorAtual = null;
+
+document.addEventListener('click', function(event) {
+
+    const jogador = event.target.closest('.jogador-item');
+
+    if (!jogador) {
+        if (menuJogadorAtual && !event.target.closest('.menu-jogador')) {
+            menuJogadorAtual.remove();
+            menuJogadorAtual = null;
+        }
+
+        return;
+    }
+
+    const jogadorId = jogador.dataset.jogadorId;
+
+    if (Number(jogadorId) === Number(window.usuarioAtualId)) {
+        return;
+    }
+
+    if (Number(window.usuarioAtualId) !== Number(window.mestreId)) {
+        return;
+    }
+
+    if (menuJogadorAtual) {
+        menuJogadorAtual.remove();
+    }
+
+    const menu = document.createElement('div');
+    menu.className = 'menu-jogador';
+
+    menu.innerHTML = `
+        <ul class="opcoes-jogador">
+            <li class="opcao-expulsar">Expulsar</li>
+            <li class="opcao-mestre">Tornar mestre</li>
+        </ul>
+    `;
+
+    document.body.appendChild(menu);
+
+    menu.querySelector('.opcao-expulsar').addEventListener('click', () => {
+        expulsarJogador(jogadorId);
+    });
+
+    menu.querySelector('.opcao-mestre').addEventListener('click', () => {
+        tornarMestre(jogadorId);
+    });
+
+    const rect = jogador.getBoundingClientRect();
+
+    menu.style.top = `${rect.bottom + 5}px`;
+    menu.style.left = `${rect.left}px`;
+
+    menuJogadorAtual = menu;
+});
+
+function tornarMestre(jogadorId) {
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+
+    fetch('/sessoes/tornar-mestre/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': window.csrftoken
+        },
+        body: JSON.stringify({
+            jogador_id: jogadorId,
+            codigo_sala: codigoSala
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status) {
+            if (menuJogadorAtual) {
+                menuJogadorAtual.remove();
+                menuJogadorAtual = null;
+            }
+            verJogadores();
+        } else {
+            alert(data.mensagem);
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao tornar mestre:', error);
+    });
+}
+
+function expulsarJogador(jogadorId) {
+    const codigoSala = document.getElementById('codigo-sala')?.value;
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+        console.error('WebSocket não está conectado.');
+        return;
+    }
+
+    socket.send(JSON.stringify({
+        mensagem: `/expulsar_jogador/${jogadorId}/${codigoSala}/`
+    }));
+
+    if (menuJogadorAtual) {
+        menuJogadorAtual.remove();
+        menuJogadorAtual = null;
+    }
+}
+
+function mostrarMensagem(titulo, mensagem) {
+    const modal = document.getElementById("mensagemModal");
+
+    document.getElementById("mensagemModalTitulo").textContent = titulo;
+    document.getElementById("mensagemModalTexto").textContent = mensagem;
+
+    const cancelar = document.getElementById("mensagemModalCancelar");
+    const confirmar = document.getElementById("mensagemModalConfirmar");
+
+    cancelar.style.display = "none";
+
+    confirmar.textContent = "OK";
+    confirmar.style.display = "block";
+
+    modal.style.display = "flex";
+
+    confirmar.onclick = () => {
+        modal.style.display = "none";
+    };
+}
+
+function mostrarModalExpulsao(mensagem) {
+    const modal = document.getElementById("mensagemModal");
+
+    document.getElementById("mensagemModalTitulo").textContent =
+        "Você foi expulso";
+
+    document.getElementById("mensagemModalTexto").textContent =
+        mensagem;
+
+    const cancelar = document.getElementById("mensagemModalCancelar");
+    const confirmar = document.getElementById("mensagemModalConfirmar");
+
+    cancelar.style.display = "none";
+
+    confirmar.textContent = "Voltar ao menu";
+    confirmar.style.display = "block";
+
+    modal.style.display = "flex";
+
+    confirmar.onclick = () => {
+        window.location.href = "/";
+    };
+}
+
+document.addEventListener('click', function(event) {
+    const botao = event.target.closest('.ficha-item .accordion-button');
+
+    if (!botao) {
+        return;
+    }
+
+    const ficha = botao.closest('.ficha-item');
+
+    if (!ficha) {
+        return;
+    }
+
+    const podeVer = ficha.dataset.podeVer === "true";
+
+    if (!podeVer) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        mostrarMensagem(
+            "Acesso negado",
+            "Você não tem visibilidade suficiente para visualizar esta ficha."
+        );
+    }
 });

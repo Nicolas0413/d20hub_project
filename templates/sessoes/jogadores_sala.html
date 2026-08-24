@@ -1,0 +1,21 @@
+<table class="tabela-usuarios">
+    <thead>
+        <tr>
+            <th class="id">ID</th>
+            <th>Username</th>
+            <th>Função</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for jogador in jogadores %}
+            <tr  class="jogador-item" data-jogador-id="{{ jogador.usuario.id }}">
+                <td class="id">{{ jogador.usuario.id }}</td>
+                <td>{{ jogador.usuario.username }}</td>
+                <td {% if jogador.role == "Mestre" %}class="role-mestre"{% endif %}>
+                    {{ jogador.role }}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

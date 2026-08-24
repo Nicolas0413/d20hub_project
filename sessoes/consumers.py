@@ -3,20 +3,42 @@ from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from django.template.loader import render_to_string
 from fichas.models import Ficha
-from .models import FichaSessao, Sala
+from .models import FichaSessao, Sala, JogadorExpulso
 
 class SalaConsumer(WebsocketConsumer):
     def connect(self):
         self.codigo_sala = self.scope['url_route']['kwargs']['codigo_sala']
+
+        usuario = self.scope['user']
+
+        try:
+            sala = Sala.objects.get(codigo=self.codigo_sala)
+        except Sala.DoesNotExist:
+            self.close()
+            return
+        
+        if JogadorExpulso.objects.filter(
+            jogador=usuario,
+            sala=sala
+        ).exists():
+            self.close()
+            return
+
+        if usuario != sala.mestre and not sala.jogadores.filter(
+            id=usuario.id
+        ).exists():
+            self.close()
+            return
+
         self.room_group_name = f"sala_{self.codigo_sala}"
-    
+
         self.accept()
-    
+
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name,
         )
-    
+
         self.send(text_data=json.dumps({
             'type': 'system',
             'message': f'Conectado à sala {self.codigo_sala}.'
@@ -113,6 +135,28 @@ class SalaConsumer(WebsocketConsumer):
                         'codigo_sala': codigo_sala
                     }
                 )
+
+        elif mensagem.startswith('/expulsar_jogador'):
+            parts = mensagem.split('/')
+            jogador_id = parts[2] if len(parts) > 2 else None
+            codigo_sala = parts[3] if len(parts) > 3 else None
+            if jogador_id and codigo_sala:
+                resultado = self.expulsar_jogador(
+                    jogador_id,
+                    codigo_sala
+                )
+
+                if resultado:
+                    jogador, fichas = resultado
+
+                    async_to_sync(self.channel_layer.group_send)(
+                        self.room_group_name,
+                        {
+                            'type': 'jogador_expulso',
+                            'jogador_id': jogador.id,
+                            'fichas': fichas,
+                        }
+    )
         else:
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -158,4 +202,60 @@ class SalaConsumer(WebsocketConsumer):
             'ficha_id': event.get('ficha_id'),
             'editabilidade': event.get('editabilidade'),
             'codigo_sala': event.get('codigo_sala')
+        }))
+
+    def mestre_atualizado(self, event):
+        self.send(text_data=json.dumps({
+            'type': 'mestre_atualizado',
+            'mestre_id': event['mestre_id'],
+        }))
+
+    def expulsar_jogador(self, jogador_id, codigo_sala):
+        try:
+            sala = Sala.objects.get(codigo=codigo_sala)
+            jogador = sala.jogadores.get(id=jogador_id)
+        except (Sala.DoesNotExist, Sala.jogadores.model.DoesNotExist):
+            return False
+
+        if sala.mestre != self.scope['user']:
+            return False
+
+        fichas = list(
+            FichaSessao.objects.filter(
+                jogador=jogador,
+                sala=sala
+            ).values_list('ficha_id', flat=True)
+        )
+
+        FichaSessao.objects.filter(
+            jogador=jogador,
+            sala=sala
+        ).delete()
+
+        sala.jogadores.remove(jogador)
+
+        JogadorExpulso.objects.get_or_create(
+            jogador=jogador,
+            sala=sala
+        )
+
+        return jogador, fichas
+
+    def jogador_expulso(self, event):
+        jogador_id = event['jogador_id']
+        fichas = event.get('fichas', [])
+
+        if self.scope['user'].id == jogador_id:
+            self.send(text_data=json.dumps({
+                'type': 'voce_foi_expulso',
+                'mensagem': 'Você foi expulso desta sala.'
+            }))
+
+            self.close()
+            return
+
+        self.send(text_data=json.dumps({
+            'type': 'jogador_expulso',
+            'jogador_id': jogador_id,
+            'fichas': fichas,
         }))

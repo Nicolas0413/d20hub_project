@@ -120,6 +120,7 @@ h1 {
   display: block !important;
   text-align: center;
   margin: 0;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .cursor {
@@ -385,4 +386,40 @@ input::placeholder {
 .tudo a:hover {
     color: white;
     text-shadow: 0 0 8px rgba(247, 40, 40, 0.8);
+}
+
+@media (max-width: 720px) {
+    .toolbar {
+        height: auto;
+        min-height: 18vh;
+        padding: 30px 80px;
+        box-sizing: border-box;
+    }
+
+    .toolbar h1 {
+        font-size: 1.6rem;
+        line-height: 1.2;
+    }
+
+    #retornar {
+        top: 15px;
+        left: 15px;
+        font-size: 16px;
+        padding: 6px 14px;
+    }
+}
+
+@media (max-width: 420px) {
+    .toolbar {
+        padding: 60px 20px 25px;
+    }
+
+    .toolbar h1 {
+        font-size: 1.4rem;
+    }
+
+    #retornar {
+        top: 12px;
+        left: 12px;
+    }
 }

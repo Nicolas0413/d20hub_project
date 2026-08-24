@@ -5,6 +5,12 @@ from django.contrib.auth.decorators import login_required
 from sessoes.models import Sala, FichaSessao
 from fichas.models import Ficha
 from fichas.views import checar_permissao
+import json
+from asgiref.sync import async_to_sync
+from contas.models import User
+from channels.layers import get_channel_layer
+from django.contrib.auth import get_user_model
+from .models import JogadorExpulso
 
 @login_required
 def criar_sala(request):
@@ -28,6 +34,11 @@ def entrar_sala(request):
 @login_required
 def sala_rpg(request, codigo_sala):
     sala = get_object_or_404(Sala, codigo=codigo_sala)
+    if JogadorExpulso.objects.filter(
+        jogador=request.user,
+        sala=sala
+    ).exists():
+        return redirect('core:home')
     minhas_fichas = Ficha.objects.filter(usuario=request.user) 
     sala.jogadores.add(request.user) 
     fichas_sessao = FichaSessao.objects.filter(sala=sala)
@@ -47,13 +58,92 @@ def selecionar_ficha(request):
         'fichas': fichas
     })
 
+def jogadores_sala(request):
+    codigo_sala = request.GET.get('codigo_sala')
+    sala = Sala.objects.get(codigo=codigo_sala)
+
+    jogadores = [
+        {
+            'usuario': sala.mestre,
+            'role': 'Mestre'
+        }
+    ]
+
+    for jogador in sala.jogadores.all():
+        if jogador != sala.mestre:
+            jogadores.append({
+                'usuario': jogador,
+                'role': 'jogador'
+            })
+
+    return render(request, 'sessoes/jogadores_sala.html', {
+        'jogadores': jogadores,
+    })
+
+def tornar_mestre(request):
+    if request.method != 'POST':
+        return JsonResponse({
+            'status': False,
+            'mensagem': 'Método inválido.'
+        })
+
+    data = json.loads(request.body)
+
+    jogador_id = data.get('jogador_id')
+    codigo_sala = data.get('codigo_sala')
+
+    sala = Sala.objects.get(codigo=codigo_sala)
+    jogador = User.objects.get(id=jogador_id)
+
+    sala.mestre = jogador
+    sala.save()
+
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        f'sala_{codigo_sala}',
+        {
+            'type': 'mestre_atualizado',
+            'mestre_id': jogador.id,
+        }
+    )
+
+    return JsonResponse({
+        'status': True
+    })
+
 @login_required
 def carregar_ficha(request, ficha_id, sala_codigo):
     ficha = get_object_or_404(Ficha, id=ficha_id)
     sala = get_object_or_404(Sala, codigo=sala_codigo)
-    FichaSessao.objects.get_or_create(ficha=ficha, sala=sala, defaults={'jogador': request.user})
-    pode_ver = checar_permissao(request, ficha, 'visibilidade')
-    return render(request, 'sessoes/carregar_fichas.html', {'ficha': ficha, 'pode_ver': pode_ver})
+
+    FichaSessao.objects.get_or_create(
+        ficha=ficha,
+        sala=sala,
+        defaults={'jogador': ficha.usuario}
+    )
+
+    if request.user == ficha.usuario:
+        pode_ver = True
+
+    elif ficha.visibilidade == 3:
+        pode_ver = True
+
+    elif ficha.visibilidade == 2:
+        pode_ver = sala.jogadores.filter(
+            id=request.user.id
+        ).exists()
+
+    elif ficha.visibilidade == 1:
+        pode_ver = request.user == sala.mestre
+
+    else:
+        pode_ver = False
+
+    return render(request, 'sessoes/carregar_fichas.html', {
+        'ficha': ficha,
+        'pode_ver': pode_ver,
+    })
 
 @login_required
 def remover_ficha(request, ficha_id, sala_codigo):

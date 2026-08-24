@@ -22,3 +22,15 @@ class FichaSessao(models.Model):
 
     class Meta:
         unique_together = (('sala', 'ficha'),)
+
+class JogadorExpulso(models.Model):
+    jogador = models.ForeignKey(
+        'contas.User',
+        on_delete=models.CASCADE
+    )
+    sala = models.ForeignKey(
+        Sala,
+        on_delete=models.CASCADE
+    )
+    class Meta:
+        unique_together = ('jogador', 'sala')

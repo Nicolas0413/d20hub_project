@@ -276,3 +276,4 @@ function confirmarAcao(titulo, mensagem, callback) {
         modal.style.display = "none";
     };
 }
+
