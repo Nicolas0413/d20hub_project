@@ -39,6 +39,7 @@
 
 .ficha-acoes {
     display: flex;
+    justify-content: center;
     gap: 10px;
     align-items: center;
 }
@@ -80,6 +81,12 @@
 .btn-visualizar:hover {
     background-color: #495057;
     color: #fff;
+    box-shadow: 0 0 10px #495057;
+}
+
+.ficha-acoes:has(.btn-ficha:only-child) .btn-visualizar {
+    width: 100%;
+    max-width: 300px;
 }
 
 .btn-retirar {

@@ -95,7 +95,7 @@ function criarDivFicha(id, nome) {
     div.appendChild(botoesDiv);
         
     const acessarBtn = document.createElement("button");
-    acessarBtn.textContent = "Acessar";
+    acessarBtn.innerHTML = '<i class="bi-file-earmark-text"></i> Acessar';
     acessarBtn.classList.add("acessarBtn");
     botoesDiv.appendChild(acessarBtn);
 
@@ -112,7 +112,7 @@ function criarDivFicha(id, nome) {
     });
         
     const excluirBtn = document.createElement("button");
-    excluirBtn.textContent = "Excluir";
+    excluirBtn.innerHTML = '<i class="bi bi-trash"></i> Excluir';
     excluirBtn.classList.add("excluirBtn");
     botoesDiv.appendChild(excluirBtn);
 
