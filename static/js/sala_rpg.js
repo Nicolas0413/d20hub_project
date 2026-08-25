@@ -310,7 +310,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             removerFichaNoFrontend(fichaId);
                         });
                     }
-                }
+            } else if (data.type === 'dice_message') {
+                adicionarRolagem(data);
+            }
         };
 
         socket.onclose = function() {
@@ -569,3 +571,50 @@ document.addEventListener('click', function(event) {
         );
     }
 });
+
+function adicionarRolagem(data) {
+    if (!mensagens) return;
+
+    const div = document.createElement('div');
+    div.classList.add('mensagem-rolagem');
+
+    const titulo = document.createElement('div');
+    titulo.classList.add('rolagem-titulo');
+    titulo.textContent = `${data.nome} rolou ${data.expressao}`;
+
+    div.appendChild(titulo);
+
+    data.resultado.resultados.forEach(rolagem => {
+        const linha = document.createElement('div');
+        linha.classList.add('rolagem-dados');
+
+        linha.innerHTML = `
+            <strong>${rolagem.expressao}:</strong>
+            [${rolagem.dados.join(', ')}]
+        `;
+
+        div.appendChild(linha);
+    });
+
+    if (data.resultado.modificador !== 0) {
+        const modificador = document.createElement('div');
+        modificador.classList.add('rolagem-modificador');
+
+        modificador.textContent =
+            `Modificador: +${data.resultado.modificador}`;
+
+        div.appendChild(modificador);
+    }
+
+    const total = document.createElement('div');
+    total.classList.add('rolagem-total');
+
+    total.innerHTML = `
+        Total: <strong>${data.resultado.total}</strong>
+    `;
+
+    div.appendChild(total);
+
+    mensagens.appendChild(div);
+    mensagens.scrollTop = mensagens.scrollHeight;
+}

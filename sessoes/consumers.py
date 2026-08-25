@@ -4,6 +4,57 @@ from asgiref.sync import async_to_sync
 from django.template.loader import render_to_string
 from fichas.models import Ficha
 from .models import FichaSessao, Sala, JogadorExpulso
+import random
+import re
+
+def rolar_dados(expressao):
+    partes = re.split(r'\s*\+\s*', expressao.strip())
+    
+    resultados = []
+    total = 0
+    modificador = 0
+
+    for parte in partes:
+        parte = parte.strip()
+        match = re.fullmatch(r'(\d*)d(\d+)', parte, re.IGNORECASE)
+
+        if match:
+            quantidade = int(match.group(1) or 1)
+            lados = int(match.group(2))
+
+            if quantidade > 100 or lados > 1000:
+                return None
+
+            dados = [
+                random.randint(1, lados)
+                for _ in range(quantidade)
+            ]
+
+            resultados.append({
+                "expressao": parte,
+                "dados": dados,
+                "soma": sum(dados)
+            })
+
+            total += sum(dados)
+
+        elif re.fullmatch(r'\d+', parte):
+            valor = int(parte)
+
+            if valor > 100000:
+                return None
+
+            modificador += valor
+            total += valor
+
+        else:
+            return None
+
+    return {
+        "resultados": resultados,
+        "modificador": modificador,
+        "total": total
+    }
 
 class SalaConsumer(WebsocketConsumer):
     def connect(self):
@@ -66,6 +117,30 @@ class SalaConsumer(WebsocketConsumer):
         mensagem = (text_data_json.get('mensagem') or '').strip()
 
         if not mensagem:
+            return
+
+        if mensagem.lower().startswith("/roll "):
+            expressao = mensagem[6:].strip()
+
+            resultado = rolar_dados(expressao)
+
+            if resultado is None:
+                self.send(text_data=json.dumps({
+                    "type": "system",
+                    "message": "Rolagem inválida."
+                }))
+                return
+
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    "type": "dice_message",
+                    "nome": self.scope["user"].username,
+                    "expressao": expressao,
+                    "resultado": resultado,
+                }
+            )
+
             return
 
         if mensagem.startswith('/carregar_ficha'):
@@ -258,4 +333,12 @@ class SalaConsumer(WebsocketConsumer):
             'type': 'jogador_expulso',
             'jogador_id': jogador_id,
             'fichas': fichas,
+        }))
+
+    def dice_message(self, event):
+        self.send(text_data=json.dumps({
+            "type": "dice_message",
+            "nome": event["nome"],
+            "expressao": event["expressao"],
+            "resultado": event["resultado"],
         }))
