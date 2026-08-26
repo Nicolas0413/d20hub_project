@@ -28,7 +28,7 @@
   </script>
 </head>
 
-<body>
+<body data-sistema="{{ ficha.sistema }}">
   <div class="sheet" data-id="{{ ficha.id }}">
     <header>
       <div style="margin-bottom: 10px; text-align: center;">
@@ -55,27 +55,26 @@
             {% endif %} 
           </div>
           <div class="level">
-            Raça:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha"> &nbsp
+            <span title="Nex">Nex</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">% &nbsp&nbsp&nbsp&nbsp
             Classe:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.classe }}" data-save="classe">    
           </div>
           <div class="level">
-            <span title="Nível">Nível</span><input class="editable" disabled value="{{ ficha.nex }}" data-save="nex" style="width: 30px;">
-            
-            Divindade:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
+            Trilha:<input class="editable" disabled style="width:80px; font-size: 14px; text-align: left;" value="{{ ficha.trilha }}" data-save="trilha">
+            Origem:<input class="editable" disabled style="width:89px; font-size: 14px; text-align: left;" value="{{ ficha.origem }}" data-save="origem">
           </div>
         </div>
       </div>
     </header>
 
+
     <div class="attributes">
-      <div class="attr" title="Força">FOR<input class="editable" value="{{ ficha.estatisticas.forca }}" disabled type="number" data-save="estatisticas.forca"></div>
-      <div class="attr" title="Destreza">DES<input class="editable" value="{{ ficha.estatisticas.agilidade }}" disabled type="number" data-save="estatisticas.agilidade"></div>
-      <div class="attr" title="Constituição">CON<input class="editable" value="{{ ficha.estatisticas.vigor }}" disabled type="number" data-save="estatisticas.vigor"></div>
-      <div class="attr" title="Intelecto">INT<input class="editable" value="{{ ficha.estatisticas.intelecto }}" disabled type="number" data-save="estatisticas.intelecto"></div>
-      <div class="attr" title="Sabedoria">SAB<input class="editable" value="{{ ficha.estatisticas.presenca }}" disabled type="number" data-save="estatisticas.presenca"></div>
-      <div class="attr" title="Carisma">CAR<input class="editable" value="{{ ficha.estatisticas.bloqueio }}" disabled type="number" data-save="estatisticas.bloqueio"></div>
-    </div>
-  
+    <div class="attr" title="Força">FOR<input class="editable" value="{{ ficha.estatisticas.forca }}" disabled type="number" data-save="estatisticas.forca"></div>
+    <div class="attr" title="Agilidade">AGI<input class="editable" value="{{ ficha.estatisticas.agilidade }}" disabled type="number" data-save="estatisticas.agilidade"></div>
+    <div class="attr" title="Intelecto">INT<input class="editable" value="{{ ficha.estatisticas.intelecto }}" disabled type="number" data-save="estatisticas.intelecto"></div>
+    <div class="attr" title="Presença">PRE<input class="editable" value="{{ ficha.estatisticas.presenca }}" disabled type="number" data-save="estatisticas.presenca"></div>
+    <div class="attr" title="Vigor">VIG<input class="editable" value="{{ ficha.estatisticas.vigor }}" disabled type="number" data-save="estatisticas.vigor"></div>
+  </div>
+
   <div class="section">
     <div class="label">VIDA</div>
     <div class="stat">
@@ -86,9 +85,8 @@
   </div>
 
   <div class="section">
-    <div class="label">MANA</div>
+    <div class="label">DETERMINAÇÃO</div>
     <div class="stat">
-      <!-- Os id's de mana se mantém os mesmos de determinação pra não precisar alterar o JavaScript e CSS -->
       <input class="editable" disabled id="detAtual" type="number" value="{{ ficha.estatisticas.pe_atual }}" data-save="estatisticas.pe_atual" style="width:60px;">
       /
       <input class="editable" disabled id="detMax" type="number" value="{{ ficha.estatisticas.pe_maximos }}" data-save="estatisticas.pe_maximos" style="width:60px; text-align: right;">
@@ -102,12 +100,12 @@
       <input class="editable" disabled type="number" value="{{ ficha.estatisticas.defesa }}" data-save="estatisticas.defesa">
     </div>
     <div>
-      <div class="label">DESLOCAMENTO</div>
+      <div class="label">ESQUIVA</div>
       <input class="editable" disabled type="number" value="{{ ficha.estatisticas.esquiva }}" data-save="estatisticas.esquiva">
     </div>
     <div>
-      <div class="label">TAMANHO</div>
-      <input class="editable" disabled type="text" value="{{ ficha.aparencia }}" data-save="aparencia">
+      <div class="label">BLOQUEIO</div>
+      <input class="editable" disabled type="number" value="{{ ficha.estatisticas.bloqueio }}" data-save="estatisticas.bloqueio">
     </div>
   </div>
 

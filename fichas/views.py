@@ -21,16 +21,28 @@ Modelos = {
 }
 
 Paginas = {
-    "detalhes": "detalhes.html",
-    "ficha": "ficha.html",
-    "habilidades": "habilidades.html",
-    "home": "home.html",
-    "inventario": "inventario.html",
-    "pericias": "pericias.html"
+    "ordem_paranormal": {
+        "detalhes": "fichas/ordem_paranormal/detalhes.html",
+        "ficha": "fichas/ordem_paranormal/ficha.html",
+        "habilidades": "fichas/ordem_paranormal/habilidades.html",
+        "inventario": "fichas/ordem_paranormal/inventario.html",
+        "pericias": "fichas/ordem_paranormal/pericias.html",
+    },
+    "ordem_paranormalPE": {
+        
+    },
+    "tormenta20": {
+        "detalhes": "fichas/tormenta20/detalhes.html",
+        "ficha": "fichas/tormenta20/ficha.html",
+        "habilidades": "fichas/tormenta20/habilidades.html",
+        "inventario": "fichas/tormenta20/inventario.html",
+        "pericias": "fichas/tormenta20/pericias.html",
+    },
+
 }
 
 Campos_Permitidos = {
-    "ficha": ["visibilidade", "editabilidade", "nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4"],
+    "ficha": ["visibilidade", "editabilidade", "nome", "personagem", "foto_personagem", "nex", "classe", "trilha", "origem", "patente", "anotacoes", "aparencia", "historia", "token_personagem", "estatisticas.forca", "estatisticas.agilidade", "estatisticas.vigor", "estatisticas.intelecto", "estatisticas.presenca", "estatisticas.pv_atual", "estatisticas.pv_maximos", "estatisticas.pe_atual", "estatisticas.pe_maximos", "estatisticas.sanidade_atual", "estatisticas.sanidade_maxima", "estatisticas.defesa", "estatisticas.esquiva", "estatisticas.bloqueio", "inventario.carga_atual", "inventario.carga_maxima", "inventario.cat1", "inventario.cat2", "inventario.cat3", "inventario.cat4", "tamanho"],
     "ataque": ["nome", "dano", "critico"],
     "pericia": ["nome", "descricao", "pagina", "dados", "bonus", "treinamento"],
     "habilidade": ["nome", "descricao", "pagina", "custo"],
@@ -39,6 +51,12 @@ Campos_Permitidos = {
 }
 
 # Funções uteis 
+
+def resolver_pagina(categoria, sistema):
+    pagina = Paginas.get(sistema, {}).get(categoria)
+    if pagina:
+        return pagina
+    return Paginas.get(categoria)
 
 def salvar(request, campospermitidos, objeto):
     dados = json.loads(request.body)
@@ -169,18 +187,13 @@ def criar_view(request, ficha_id, categoria):
 @login_required
 def ler_view(request, ficha_id, categoria):
     ficha = get_object_or_404(Ficha, id=ficha_id)
-    pagina = Paginas.get(categoria)
+    url = resolver_pagina(categoria, ficha.sistema)
 
-    if not pagina:
+    if not url:
         return JsonResponse(
             {"status": False, "mensagem": "Não encontrada"},
             status=404
         )
-
-    if categoria == "ficha" and ficha.sistema == "tormenta20":
-        pagina = "ficha_T20.html"
-
-    url = 'fichas/' + pagina
 
     if not checar_permissao(request, ficha, "visibilidade"):
         return JsonResponse(
@@ -188,11 +201,7 @@ def ler_view(request, ficha_id, categoria):
             status=403
         )
 
-    pode_editar = checar_permissao(
-        request,
-        ficha,
-        "editabilidade"
-    )
+    pode_editar = checar_permissao(request, ficha, "editabilidade")
 
     return render(request, url, {
         'ficha': ficha,

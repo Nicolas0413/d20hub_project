@@ -596,3 +596,18 @@ textarea {
 .attributes.attributes-6 {
   grid-template-columns: repeat(6, 1fr);
 }
+
+body[data-sistema="tormenta20"] {
+  background-image: url(../img/SEU_ARQUIVO_AQUI.png);
+}
+
+body[data-sistema="tormenta20"] .attributes.attributes-6 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+body[data-sistema="tormenta20"] .attributes.attributes-6 .attr {
+  flex: 0 0 calc(25% - 0.4rem);
+}

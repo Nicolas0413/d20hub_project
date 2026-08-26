@@ -4,7 +4,7 @@ from django.conf import settings
 class Ficha(models.Model):
     SISTEMA_CHOICES = [
         ('ordem_paranormal', 'Ordem Paranormal'),
-        ('tormenta', 'Tormenta'),
+        ('ordem_paranormalPE', 'Ordem paranormal PE e SAN'),
         ('tormenta20', 'Tormenta 20'),
     ]
 
@@ -20,6 +20,7 @@ class Ficha(models.Model):
     trilha = models.CharField(max_length=32, default="Aniquilador")
     origem = models.CharField(max_length=32, default="Acadêmico")
     patente = models.CharField(max_length=32, default="Recruta")
+    tamanho = models.CharField(max_length=32, default="Médio")
     anotacoes = models.TextField(default="Anotações gerais sobre o personagem e missões")
     aparencia = models.TextField(default="Descrição física do personagem como: gênero, idade, altura etc.")
     historia = models.TextField(default="História do personagem (de onde veio, qual seu objetivo etc.)")
