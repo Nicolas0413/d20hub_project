@@ -79,8 +79,8 @@ td.id {
 }
 
 .opcao a, .opcao a:visited {
-    background-color: rgb(192, 33, 33);
-    color: rgb(247, 237, 237);
+    background-color: rgb(192, 33, 33) !important;
+    color: rgb(247, 237, 237) !important;
     padding: 20px;
     padding-bottom: 8px;
     padding-top: 8px;
@@ -120,7 +120,7 @@ h1 {
   display: block !important;
   text-align: center;
   margin: 0;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Space Mono', Courier, monospace;
 }
 
 .cursor {
